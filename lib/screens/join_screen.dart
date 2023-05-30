@@ -1,0 +1,140 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_colorehu/platforms/login_platform.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_button/sign_button.dart';
+
+class JoinScreen extends StatefulWidget {
+  const JoinScreen({super.key});
+
+  @override
+  State<JoinScreen> createState() => _JoinScreenState();
+}
+
+class _JoinScreenState extends State<JoinScreen> {
+  LoginPlatform _loginPlatform = LoginPlatform.none;
+
+  void signInWithGoogle() async {
+    //final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    final GoogleSignIn googleSignIn = GoogleSignIn();
+    final googleUser = await googleSignIn.signIn();
+
+    if (googleUser != null) {
+      print('name = ${googleUser.displayName}');
+      print('email = ${googleUser.email}');
+      print('id = ${googleUser.id}');
+      print('serverAuthCode = ${googleUser.serverAuthCode}');
+      print('${googleUser.hashCode}');
+
+      setState(() {
+        _loginPlatform = LoginPlatform.google;
+      });
+    }
+  }
+
+  final formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Flexible(
+            child: Container(
+              margin: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 80,
+              ),
+              padding: const EdgeInsets.symmetric(
+                vertical: 20,
+                horizontal: 10,
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.amber,
+              ),
+              child: _loginPlatform != LoginPlatform.none
+                  ? SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          const Text(
+                            "Welcome!",
+                            style: TextStyle(
+                              fontSize: 64,
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
+                          Form(
+                            key: formKey,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const SizedBox(
+                                  height: 60,
+                                ),
+                                TextFormField(
+                                  decoration: const InputDecoration(
+                                    labelText: "ID",
+                                    border: OutlineInputBorder(
+                                      borderSide: BorderSide(),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 30,
+                                ),
+                                TextFormField(
+                                  decoration: const InputDecoration(
+                                    labelText: "PW",
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 30,
+                                ),
+                                TextFormField(
+                                  decoration: const InputDecoration(
+                                    labelText: "Nickname",
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 30,
+                                ),
+                                Column(
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text("Complete"),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : SignInButton(
+                      buttonType: ButtonType.google,
+                      imagePosition: ImagePosition.right,
+                      //[buttonSize] You can also use this in combination with [width]. Increases the font and icon size of the button.
+                      buttonSize: ButtonSize.large,
+                      btnTextColor: Colors.grey,
+                      btnColor: Colors.white,
+                      width: 140,
+                      //[width] Use if you change the text value.
+                      btnText: 'Google',
+                      onPressed: () => signInWithGoogle(),
+                    ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
