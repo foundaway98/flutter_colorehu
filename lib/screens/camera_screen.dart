@@ -85,6 +85,9 @@ class _CameraScreenState extends State<CameraScreen> {
                     children: [
                       Row(
                         children: [
+                          SizedBox(
+                            width: 10,
+                          ),
                           ValueListenableBuilder<Color?>(
                             valueListenable: hoveredColor,
                             builder: (context, value, _) => Container(
@@ -93,25 +96,35 @@ class _CameraScreenState extends State<CameraScreen> {
                               height: 24,
                             ),
                           ),
+                          SizedBox(
+                            width: 10,
+                          ),
                           Text(colorHex),
+                          SizedBox(
+                            width: 10,
+                          ),
                           Text(colorName)
                         ],
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          if (colorHex == '') {
-                          } else {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ColorSuggestScreen(
-                                        color: colorHex,
-                                      )),
-                            );
-                          }
-                        },
-                        child: Text('추천받기'),
-                      )
+                      Row(children: [
+                        GestureDetector(
+                          onTap: () {
+                            if (colorHex == '') {
+                            } else {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ColorSuggestScreen(
+                                          color: colorHex,
+                                        )),
+                              );
+                            }
+                          },
+                          child: Text('추천받기'),
+                        ),
+                        Icon(Icons.arrow_forward),
+                        SizedBox(width: 10,),
+                      ])
                     ],
                   )),
               Flexible(
