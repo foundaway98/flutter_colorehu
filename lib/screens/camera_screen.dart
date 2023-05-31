@@ -85,7 +85,7 @@ class _CameraScreenState extends State<CameraScreen> {
                     children: [
                       Row(
                         children: [
-                          SizedBox(
+                          const SizedBox(
                             width: 10,
                           ),
                           ValueListenableBuilder<Color?>(
@@ -96,11 +96,11 @@ class _CameraScreenState extends State<CameraScreen> {
                               height: 24,
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 10,
                           ),
                           Text(colorHex),
-                          SizedBox(
+                          const SizedBox(
                             width: 10,
                           ),
                           Text(colorName)
@@ -120,10 +120,12 @@ class _CameraScreenState extends State<CameraScreen> {
                               );
                             }
                           },
-                          child: Text('추천받기'),
+                          child: const Text('추천받기'),
                         ),
-                        Icon(Icons.arrow_forward),
-                        SizedBox(width: 10,),
+                        const Icon(Icons.arrow_forward),
+                        const SizedBox(
+                          width: 10,
+                        ),
                       ])
                     ],
                   )),
