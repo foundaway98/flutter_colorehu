@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ColorSuggestScreen extends StatefulWidget {
-  const ColorSuggestScreen({
-    super.key,
-    required this.color
-  });
+  const ColorSuggestScreen({super.key, required this.color});
 
   final String color;
   @override
@@ -50,7 +47,13 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
             Flexible(
               flex: 1,
               child: Container(
-                decoration: const BoxDecoration(color: Colors.amber),
+                decoration: widget.color == ''
+                    ? const BoxDecoration()
+                    : BoxDecoration(
+                        color: Color(
+                          int.parse(widget.color, radix: 16),
+                        ),
+                      ),
                 margin:
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
                 padding:
