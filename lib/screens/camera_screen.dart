@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:colornames/colornames.dart';
+import 'color_suggest_screen.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({
@@ -22,6 +24,7 @@ class _CameraScreenState extends State<CameraScreen> {
   late CameraController _controller;
   late List<CameraDescription> cameras;
   late File userImage;
+  String colorName = '';
 
   bool _cameraInitialized = false;
 
@@ -78,16 +81,37 @@ class _CameraScreenState extends State<CameraScreen> {
                   flex: 1,
                   fit: FlexFit.tight,
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      ValueListenableBuilder<Color?>(
-                        valueListenable: hoveredColor,
-                        builder: (context, value, _) => Container(
-                          color: value ?? Colors.transparent,
-                          width: 24,
-                          height: 24,
-                        ),
+                      Row(
+                        children: [
+                          ValueListenableBuilder<Color?>(
+                            valueListenable: hoveredColor,
+                            builder: (context, value, _) => Container(
+                              color: value ?? Colors.transparent,
+                              width: 24,
+                              height: 24,
+                            ),
+                          ),
+                          Text(colorHex),
+                          Text(colorName)
+                        ],
                       ),
-                      Text(colorHex),
+                      GestureDetector(
+                        onTap: () {
+                          if (colorHex == '') {
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ColorSuggestScreen(
+                                        color: colorHex,
+                                      )),
+                            );
+                          }
+                        },
+                        child: Text('추천받기'),
+                      )
                     ],
                   )),
               Flexible(
@@ -123,6 +147,9 @@ class _CameraScreenState extends State<CameraScreen> {
                               colorHex = hoveredColor.value
                                   .toString()
                                   .substring(8, 16);
+                              colorName =
+                                  int.parse(colorHex.substring(2, 7), radix: 16)
+                                      .colorName;
                             });
                           },
                         ),
