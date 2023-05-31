@@ -6,6 +6,8 @@ import 'package:flutter_colorehu/screens/color_suggest_screen.dart';
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
+  static String routeName = "/main_screen.dart";
+
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
@@ -13,66 +15,73 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('colorehu'),
-      ),
-      drawer: const Drawer(),
-      body: Column(
-        children: [
-          Expanded(
-            flex: 2,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CameraScreen(),
-                  ),
-                );
-              },
-              child: MainScreenBtn(
-                buttonName: "Camera",
-                buttonIcon: Icons.camera_alt_outlined,
-                buttonColor: Colors.blue.shade400,
+    return WillPopScope(
+      onWillPop: () {
+        return Future(() => false);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('colorehu'),
+        ),
+        drawer: const Drawer(),
+        body: Column(
+          children: [
+            Expanded(
+              flex: 2,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CameraScreen(),
+                    ),
+                  );
+                },
+                child: MainScreenBtn(
+                  buttonName: "Camera",
+                  buttonIcon: Icons.camera_alt_outlined,
+                  buttonColor: Colors.blue.shade400,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            flex: 1,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ColorSuggestScreen(color: '',)),
-                );
-              },
-              child: MainScreenBtn(
-                buttonName: "Color Suggest",
-                buttonIcon: Icons.color_lens_outlined,
-                buttonColor: Colors.blue.shade300,
+            Expanded(
+              flex: 1,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ColorSuggestScreen(
+                              color: '',
+                            )),
+                  );
+                },
+                child: MainScreenBtn(
+                  buttonName: "Color Suggest",
+                  buttonIcon: Icons.color_lens_outlined,
+                  buttonColor: Colors.blue.shade300,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            flex: 1,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const CameraFilterScreen()),
-                );
-              },
-              child: MainScreenBtn(
-                buttonName: "Filter",
-                buttonIcon: Icons.filter_b_and_w_outlined,
-                buttonColor: Colors.blue.shade200,
+            Expanded(
+              flex: 1,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const CameraFilterScreen()),
+                  );
+                },
+                child: MainScreenBtn(
+                  buttonName: "Filter",
+                  buttonIcon: Icons.filter_b_and_w_outlined,
+                  buttonColor: Colors.blue.shade200,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

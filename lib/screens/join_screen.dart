@@ -12,6 +12,11 @@ class JoinScreen extends StatefulWidget {
 
 class _JoinScreenState extends State<JoinScreen> {
   LoginPlatform _loginPlatform = LoginPlatform.none;
+  late String pw;
+  late String checkedPW;
+  bool checked = false;
+  IconData checked_icon = Icons.cancel;
+  late String email;
 
   void signInWithGoogle() async {
     //final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -24,6 +29,8 @@ class _JoinScreenState extends State<JoinScreen> {
       print('id = ${googleUser.id}');
       print('serverAuthCode = ${googleUser.serverAuthCode}');
       print('${googleUser.hashCode}');
+
+      email = googleUser.email;
 
       setState(() {
         _loginPlatform = LoginPlatform.google;
@@ -75,6 +82,7 @@ class _JoinScreenState extends State<JoinScreen> {
                                   height: 60,
                                 ),
                                 TextFormField(
+                                  initialValue: email,
                                   decoration: const InputDecoration(
                                     labelText: "ID",
                                     border: OutlineInputBorder(
@@ -86,6 +94,10 @@ class _JoinScreenState extends State<JoinScreen> {
                                   height: 30,
                                 ),
                                 TextFormField(
+                                  onChanged: (text) {
+                                    pw = text;
+                                  },
+                                  obscureText: true,
                                   decoration: const InputDecoration(
                                     labelText: "PW",
                                     border: OutlineInputBorder(),
@@ -93,6 +105,33 @@ class _JoinScreenState extends State<JoinScreen> {
                                 ),
                                 const SizedBox(
                                   height: 30,
+                                ),
+                                TextFormField(
+                                  onChanged: (text) {
+                                    checkedPW = text;
+                                    if(checkedPW == pw) {
+                                      setState(() {
+                                        checked_icon = Icons.check_circle;
+                                      });
+                                    }else{
+                                      setState(() {
+                                        checked_icon = Icons.cancel;
+                                      });
+                                    }
+                                  },
+                                  obscureText: true,
+                                  decoration: const InputDecoration(
+                                    labelText: "PW checked",
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 30,
+                                  child: Row(
+                                    children: [Icon(
+                                      checked_icon,
+                                    )]
+                                  ),
                                 ),
                                 TextFormField(
                                   decoration: const InputDecoration(
