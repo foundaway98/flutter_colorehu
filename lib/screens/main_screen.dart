@@ -45,7 +45,7 @@ class _MainScreenState extends State<MainScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const ColorSuggestScreen()),
+                      builder: (context) => const ColorSuggestScreen(color: '',)),
                 );
               },
               child: MainScreenBtn(

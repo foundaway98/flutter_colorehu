@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 class ColorSuggestScreen extends StatefulWidget {
   const ColorSuggestScreen({
     super.key,
+    required this.color
   });
 
+  final String color;
   @override
   State<ColorSuggestScreen> createState() => _ColorSuggestScreenState();
 }
@@ -25,6 +27,7 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Text(widget.color),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
