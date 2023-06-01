@@ -22,12 +22,26 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
 
   List<bool> colorFlag = [false, false, false, false, false];
 
-  List<String> colorTester = ["test1", "test2", "test3", "test4", "test5"];
   List<String> colorSuggestionList = ["a", "b", "c"];
-  List<List<String>> colorSet = [
-    ["r", "g", "b"],
-    ["r", "y", "b", "a"],
-    ["r", "w", "g", "g", "t"],
+  List<List<Color>> colorSet = [
+    [
+      Colors.black,
+      Colors.white,
+      Colors.grey,
+    ],
+    [
+      Colors.red,
+      Colors.green,
+      Colors.blue,
+      Colors.orange,
+    ],
+    [
+      Colors.blueGrey,
+      Colors.grey,
+      Colors.amber,
+      Colors.yellowAccent,
+      Colors.deepPurple,
+    ],
   ];
 
   @override
@@ -103,13 +117,14 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
               });
             },
             child: const SizedBox(
-                width: 20,
-                child: Text(
-                  "x",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                  ),
-                )),
+              width: 20,
+              child: Text(
+                "x",
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
           ),
           GestureDetector(
             onTap: () {
@@ -123,7 +138,6 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                         setState(() {
                           colorFlag[i] = true;
                           colorPack[i] = value;
-                          print(colorFlag);
                         });
                       },
                       config: const ColorPickerConfig(
@@ -142,7 +156,15 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
               decoration: BoxDecoration(color: colorPack[i]),
               width: 50,
               height: 50,
-              margin: const EdgeInsets.only(top: 10),
+              child: i == 0
+                  ? Center(
+                      child: Text(
+                        "M",
+                        style: TextStyle(
+                            backgroundColor: Colors.white.withOpacity(0.1)),
+                      ),
+                    )
+                  : const Text(""),
             ),
           ),
           SizedBox(
@@ -165,19 +187,56 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
         itemBuilder: (context, index) {
           return Column(
             children: [
-              Text(
-                colorSuggestionList[index],
-                style: const TextStyle(
-                  fontSize: 44,
-                ),
-              ),
+              const Text("Color Name + Color Name"),
               Row(
-                children: [for (var color in colorSet[index]) Text(color)],
-              )
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (var color in colorSet[index])
+                        Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: color,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 0,
+                                    blurRadius: 3.0,
+                                    offset: const Offset(
+                                      0,
+                                      3,
+                                    ), // changes position of shadow
+                                  ),
+                                ],
+                              ),
+                              margin: const EdgeInsets.symmetric(horizontal: 5),
+                              width: 50,
+                              height: 50,
+                            ),
+                            SizedBox(
+                              width: 50,
+                              child: Text(color.colorName),
+                            )
+                          ],
+                        )
+                    ],
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.favorite_border_rounded),
+                  )
+                ],
+              ),
             ],
           );
         },
-        separatorBuilder: (context, index) => const SizedBox(height: 5),
+        separatorBuilder: (context, index) {
+          return const SizedBox(height: 5);
+        },
         itemCount: colorSuggestionList.length);
   }
 }
