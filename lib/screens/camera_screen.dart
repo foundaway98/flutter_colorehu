@@ -162,9 +162,7 @@ class _CameraScreenState extends State<CameraScreen> {
                               colorHex = hoveredColor.value
                                   .toString()
                                   .substring(8, 16);
-                              colorName =
-                                  int.parse(colorHex.substring(2, 7), radix: 16)
-                                      .colorName;
+                              colorName = colorHex.toColor().colorName;
                             });
                           },
                         ),
