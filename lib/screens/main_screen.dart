@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorehu/screens/camera_filter_screen.dart';
 import 'package:flutter_colorehu/screens/camera_screen.dart';
 import 'package:flutter_colorehu/screens/color_suggest_screen.dart';
+import 'package:flutter_colorehu/screens/my_page_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -23,7 +24,36 @@ class _MainScreenState extends State<MainScreen> {
         appBar: AppBar(
           title: const Text('colorehu'),
         ),
-        drawer: const Drawer(),
+        drawer: Drawer(
+          child: ListView(
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              const DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.amber,
+                ),
+                child: Text("User Nickname"),
+              ),
+              ListTile(
+                tileColor: Colors.grey.shade300,
+                title: const Text("My Page"),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MyPageScreeen(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                tileColor: Colors.grey.shade300,
+                title: const Text("Log out"),
+                onTap: () {},
+              )
+            ],
+          ),
+        ),
         body: Column(
           children: [
             Expanded(
