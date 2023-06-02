@@ -41,10 +41,12 @@ dependencies:
   cyclop: ^0.6.2
   camera_filters: ^0.2.3
   google_sign_in: ^6.1.2
+  colornames: ^0.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  http: any
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
