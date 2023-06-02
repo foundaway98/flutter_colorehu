@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_colorehu/model/model_signin.dart';
 import 'package:flutter_colorehu/platforms/login_platform.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_button/sign_button.dart';
+import 'package:http/http.dart' as http;
 
 class JoinScreen extends StatefulWidget {
   const JoinScreen({super.key});
@@ -17,6 +21,12 @@ class _JoinScreenState extends State<JoinScreen> {
   bool checked = false;
   IconData checked_icon = Icons.cancel;
   late String email;
+  TextEditingController nickname_controller = TextEditingController();
+  @override
+  void dispose(){
+    nickname_controller.dispose();
+    super.dispose();
+  }
 
   void signInWithGoogle() async {
     //final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -37,6 +47,15 @@ class _JoinScreenState extends State<JoinScreen> {
       });
     }
   }
+  toServer(String nickname, String email) async{
+    var user = User(nickname: nickname,email: email);
+    final response = await http.post(
+        Uri.http('54.156.21.48:8000','signin'),
+        body: user.toJson()
+    );
+    return response.body;
+  }
+
 
   final formKey = GlobalKey<FormState>();
 
@@ -134,6 +153,7 @@ class _JoinScreenState extends State<JoinScreen> {
                                   ),
                                 ),
                                 TextFormField(
+                                  controller: nickname_controller,
                                   decoration: const InputDecoration(
                                     labelText: "Nickname",
                                     border: OutlineInputBorder(),
@@ -146,6 +166,7 @@ class _JoinScreenState extends State<JoinScreen> {
                                   children: [
                                     ElevatedButton(
                                       onPressed: () {
+                                        toServer(nickname_controller.text, email);
                                         Navigator.pop(context);
                                       },
                                       child: const Text("Complete"),

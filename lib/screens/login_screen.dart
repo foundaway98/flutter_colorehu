@@ -1,12 +1,31 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_colorehu/model/api_adapter.dart';
 import 'package:flutter_colorehu/screens/join_screen.dart';
 import 'package:flutter_colorehu/screens/main_screen.dart';
+import 'package:http/http.dart' as http;
+import '../model/model_signin.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreen();
+}
+
+fromServer() async{
+
+  final response = await http.get(
+      Uri.http('54.156.21.48:8000','signin/get'),
+  );
+  print(response.statusCode);
+  String responsebody = utf8.decode(response.bodyBytes);
+  List<User> list= parseUsers(responsebody);
+  print('${list[0].nickname} ${list[0].email}');
+  print('${list[1].nickname} ${list[1].email}');
+
+  return response.body;
 }
 
 class _LoginScreen extends State<LoginScreen> {
@@ -81,6 +100,7 @@ class _LoginScreen extends State<LoginScreen> {
                       ),
                       ElevatedButton(
                         onPressed: () {
+                          fromServer();
                           Navigator.push(
                             context,
                             MaterialPageRoute(
