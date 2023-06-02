@@ -44,6 +44,23 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
     ],
   ];
 
+  List<List<String>> name = [
+    ['ppt', '00000', 'asdasda'],
+    [
+      'data',
+      '00000',
+      'asdasda',
+      '00000',
+      '00000',
+    ],
+    ['fashion', '00000', 'asdasda'],
+  ];
+
+  List<Text> buttons = [Text('PPT'), Text('fashion'), Text('interior')];
+
+  List<bool> button_selected = [false, false, false];
+  int color_num = -1;
+
   @override
   void initState() {
     super.initState();
@@ -82,16 +99,81 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
               ],
             ),
             Flexible(
-              flex: 1,
+                flex: 1,
+                child: GestureDetector(
+                  onTap: () {
+                    if (color_num == 4) {
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return Dialog(
+                            child: ColorPicker(
+                              selectedColor: colorPack[color_num],
+                              onColorSelected: (value) {
+                                setState(() {
+                                  colorFlag[color_num] = true;
+                                  colorPack[color_num] = value;
+                                });
+                              },
+                              config: const ColorPickerConfig(
+                                enableLibrary: false,
+                                enableEyePicker: false,
+                                enableOpacity: false,
+                              ),
+                              onClose: Navigator.of(context).pop,
+                              onEyeDropper: () {},
+                            ),
+                          );
+                        },
+                      );
+                      color_num++;
+                    }
+                  },
+                  child: Icon(
+                    Icons.add,
+                    size: 50,
+                  ),
+                )),
+            Flexible(
+              flex: 2,
               fit: FlexFit.tight,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  for (int i = 0; i < colorPack.length; i++)
-                    makeColorPickerButton(context, i),
-                ],
-              ),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        for (int i = 0; i < colorPack.length; i++)
+                          makeColorPickerButton(context, i),
+                      ],
+                    ),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        return ToggleButtons(
+                          constraints: BoxConstraints.expand(
+                              width: constraints.maxWidth / 3.3),
+                          fillColor: Colors.blueGrey,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(8)),
+                          onPressed: (index) {
+                            setState(() {
+                              for (int i = 0; i < button_selected.length; i++) {
+                                if (i == index) {
+                                  button_selected[i] = true;
+                                } else {
+                                  button_selected[i] = false;
+                                }
+                              }
+                            });
+                          },
+                          children: buttons,
+                          isSelected: button_selected,
+                        );
+                      },
+                    )
+                  ]),
             ),
             Flexible(
               flex: 3,
@@ -111,10 +193,17 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
         children: [
           GestureDetector(
             onTap: () {
-              setState(() {
-                colorFlag[i] = false;
-                colorPack[i] = Colors.white;
-              });
+              colorFlag[i]
+                  ? setState(() {
+                      colorFlag.removeAt(i);
+                      colorPack.removeAt(i);
+                      color_num--;
+                      if (color_num < -1) color_num = -1;
+
+                      colorFlag.add(false);
+                      colorPack.add(Colors.white);
+                    })
+                  : () {};
             },
             child: const SizedBox(
               width: 20,
@@ -128,29 +217,29 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
           ),
           GestureDetector(
             onTap: () {
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return Dialog(
-                    child: ColorPicker(
-                      selectedColor: colorPack[i],
-                      onColorSelected: (value) {
-                        setState(() {
-                          colorFlag[i] = true;
-                          colorPack[i] = value;
-                        });
-                      },
-                      config: const ColorPickerConfig(
-                        enableLibrary: false,
-                        enableEyePicker: false,
-                        enableOpacity: false,
-                      ),
-                      onClose: Navigator.of(context).pop,
-                      onEyeDropper: () {},
-                    ),
-                  );
-                },
-              );
+              // showDialog(
+              //   context: context,
+              //   builder: (context) {
+              //     return Dialog(
+              //       child: ColorPicker(
+              //         selectedColor: colorPack[i],
+              //         onColorSelected: (value) {
+              //           setState(() {
+              //             colorFlag[i] = true;
+              //             colorPack[i] = value;
+              //           });
+              //         },
+              //         config: const ColorPickerConfig(
+              //           enableLibrary: false,
+              //           enableEyePicker: false,
+              //           enableOpacity: false,
+              //         ),
+              //         onClose: Navigator.of(context).pop,
+              //         onEyeDropper: () {},
+              //       ),
+              //     );
+              //   },
+              // );
             },
             child: Container(
               decoration: BoxDecoration(color: colorPack[i]),
@@ -169,8 +258,9 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
           ),
           SizedBox(
             width: 50,
+            height: 50,
             child: Text(
-              colorPack[i].colorName,
+              colorFlag[i] ? colorPack[i].colorName : '',
               style: const TextStyle(
                 fontSize: 12,
               ),
