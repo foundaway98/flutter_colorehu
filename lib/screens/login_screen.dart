@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_colorehu/model/api_adapter.dart';
+import 'package:flutter_colorehu/models/api_adapter.dart';
 import 'package:flutter_colorehu/screens/join_screen.dart';
 import 'package:flutter_colorehu/screens/main_screen.dart';
 import 'package:http/http.dart' as http;
-import '../model/model_signin.dart';
+import '../models/model_signin.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,7 +17,7 @@ class LoginScreen extends StatefulWidget {
 fromServer() async{
 
   final response = await http.get(
-      Uri.http('54.156.21.48:8000','signin/get'),
+      Uri.http('54.252.58.5:8000','signin/get'),
   );
   print(response.statusCode);
   String responsebody = utf8.decode(response.bodyBytes);
