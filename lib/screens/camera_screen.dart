@@ -156,8 +156,13 @@ class _CameraScreenState extends State<CameraScreen> {
                           icon: Icons.colorize,
                           onColor: (value) => {},
                           onColorChanged: (value) {
-                            hoveredColor.value = abgr2Color(
-                                int.parse(cutColor(value), radix: 16));
+                            if (Platform.isIOS) {
+                              hoveredColor.value = abgr2Color(
+                                  int.parse(cutColor(value), radix: 16));
+                            } else {
+                              hoveredColor.value =
+                                  Color(int.parse(cutColor(value), radix: 16));
+                            }
                             setState(() {
                               colorHex = hoveredColor.value
                                   .toString()
@@ -177,7 +182,7 @@ class _CameraScreenState extends State<CameraScreen> {
                               isClicked = !isClicked;
                             });
                           },
-                          icon: const Icon(Icons.mode_comment),
+                          icon: const Icon(Icons.change_circle),
                         ),
                       ),
                     ),
