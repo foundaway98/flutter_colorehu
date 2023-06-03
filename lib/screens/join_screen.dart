@@ -1,9 +1,11 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
-// import 'package:flutter_colorehu/model/model_signin.dart';
+import 'package:flutter_colorehu/models/model_signin.dart';
 import 'package:flutter_colorehu/platforms/login_platform.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_button/sign_button.dart';
-// import 'package:http/http.dart' as http;
+import 'package:http/http.dart' as http;
 
 class JoinScreen extends StatefulWidget {
   const JoinScreen({super.key});
@@ -19,11 +21,16 @@ class _JoinScreenState extends State<JoinScreen> {
   bool checked = false;
   // IconData checked_icon = Icons.cancel;
   late String email;
-  // TextEditingController nickname_controller = TextEditingController();
-  @override
-  void dispose() {
-    // nickname_controller.dispose();
-    super.dispose();
+  late String displayName;
+
+  toServer(String nickname, String email) async {
+    var user = User(id:0,nickname: nickname, email: email);
+    final response = await http.post(
+        Uri.http('54.252.58.5:8000', 'signin/'),
+        body: user.toJson()
+    );
+
+    return response.body;
   }
 
   void signInWithGoogle() async {
@@ -32,13 +39,16 @@ class _JoinScreenState extends State<JoinScreen> {
     final googleUser = await googleSignIn.signIn();
 
     if (googleUser != null) {
-      // print('name = ${googleUser.displayName}');
-      // print('email = ${googleUser.email}');
-      // print('id = ${googleUser.id}');
-      // print('serverAuthCode = ${googleUser.serverAuthCode}');
-      // print('${googleUser.hashCode}');
+      print('name = ${googleUser.displayName}');
+      print('email = ${googleUser.email}');
+      print('id = ${googleUser.id}');
+      print('serverAuthCode = ${googleUser.serverAuthCode}');
+      print('${googleUser.hashCode}');
 
       email = googleUser.email;
+      displayName = googleUser.displayName!;
+
+      toServer(displayName, email);
 
       setState(() {
         _loginPlatform = LoginPlatform.google;
@@ -46,12 +56,7 @@ class _JoinScreenState extends State<JoinScreen> {
     }
   }
 
-  // toServer(String nickname, String email) async {
-  //   var user = User(nickname: nickname, email: email);
-  //   final response = await http.post(Uri.http('54.156.21.48:8000', 'signin'),
-  //       body: user.toJson());
-  //   return response.body;
-  // }
+
 
   final formKey = GlobalKey<FormState>();
 
