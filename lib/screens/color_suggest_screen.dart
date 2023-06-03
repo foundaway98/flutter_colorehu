@@ -56,10 +56,14 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
     ['fashion', '00000', 'asdasda'],
   ];
 
-  List<Text> buttons = [Text('PPT'), Text('fashion'), Text('interior')];
+  List<Text> buttons = [
+    const Text('PPT'),
+    const Text('fashion'),
+    const Text('interior')
+  ];
 
   List<bool> button_selected = [false, false, false];
-  int color_num = -1;
+  late int color_num;
 
   @override
   void initState() {
@@ -67,6 +71,9 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
     if (widget.color != "") {
       colorPack[0] = widget.color.toColor();
       colorFlag[0] = true;
+      color_num = 0;
+    } else {
+      color_num = -1;
     }
   }
 
@@ -130,7 +137,7 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                       color_num++;
                     }
                   },
-                  child: Icon(
+                  child: const Icon(
                     Icons.add,
                     size: 50,
                   ),
@@ -168,8 +175,8 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                               }
                             });
                           },
-                          children: buttons,
                           isSelected: button_selected,
+                          children: buttons,
                         );
                       },
                     )
