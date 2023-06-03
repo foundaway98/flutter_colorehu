@@ -62,8 +62,8 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
     const Text('interior')
   ];
 
-  List<bool> button_selected = [false, false, false];
-  late int color_num;
+  List<bool> buttonSelected = [true, false, false];
+  late int colorNum;
 
   @override
   void initState() {
@@ -71,9 +71,9 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
     if (widget.color != "") {
       colorPack[0] = widget.color.toColor();
       colorFlag[0] = true;
-      color_num = 0;
+      colorNum = 0;
     } else {
-      color_num = -1;
+      colorNum = -1;
     }
   }
 
@@ -109,18 +109,18 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                 flex: 1,
                 child: GestureDetector(
                   onTap: () {
-                    if (color_num == 4) {
+                    if (colorNum == 4) {
                     } else {
                       showDialog(
                         context: context,
                         builder: (context) {
                           return Dialog(
                             child: ColorPicker(
-                              selectedColor: colorPack[color_num],
+                              selectedColor: colorPack[colorNum],
                               onColorSelected: (value) {
                                 setState(() {
-                                  colorFlag[color_num] = true;
-                                  colorPack[color_num] = value;
+                                  colorFlag[colorNum] = true;
+                                  colorPack[colorNum] = value;
                                 });
                               },
                               config: const ColorPickerConfig(
@@ -134,7 +134,7 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                           );
                         },
                       );
-                      color_num++;
+                      colorNum++;
                     }
                   },
                   child: const Icon(
@@ -161,21 +161,22 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                         return ToggleButtons(
                           constraints: BoxConstraints.expand(
                               width: constraints.maxWidth / 3.3),
-                          fillColor: Colors.blueGrey,
+                          fillColor: Colors.cyan,
+                          selectedColor: Colors.black,
                           borderRadius:
                               const BorderRadius.all(Radius.circular(8)),
                           onPressed: (index) {
                             setState(() {
-                              for (int i = 0; i < button_selected.length; i++) {
+                              for (int i = 0; i < buttonSelected.length; i++) {
                                 if (i == index) {
-                                  button_selected[i] = true;
+                                  buttonSelected[i] = true;
                                 } else {
-                                  button_selected[i] = false;
+                                  buttonSelected[i] = false;
                                 }
                               }
                             });
                           },
-                          isSelected: button_selected,
+                          isSelected: buttonSelected,
                           children: buttons,
                         );
                       },
@@ -204,8 +205,8 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                   ? setState(() {
                       colorFlag.removeAt(i);
                       colorPack.removeAt(i);
-                      color_num--;
-                      if (color_num < -1) color_num = -1;
+                      colorNum--;
+                      if (colorNum < -1) colorNum = -1;
 
                       colorFlag.add(false);
                       colorPack.add(Colors.white);
@@ -249,15 +250,44 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
               // );
             },
             child: Container(
-              decoration: BoxDecoration(color: colorPack[i]),
-              width: 50,
-              height: 50,
+              decoration: BoxDecoration(
+                color: colorPack[i],
+                border: Border.all(),
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 0,
+                    blurRadius: 3.0,
+                    offset: const Offset(
+                      0,
+                      3,
+                    ), // changes position of shadow
+                  ),
+                ],
+              ),
+              width: i == 0 ? 55 : 50,
+              height: i == 0 ? 55 : 50,
               child: i == 0
                   ? Center(
-                      child: Text(
-                        "M",
-                        style: TextStyle(
-                            backgroundColor: Colors.white.withOpacity(0.1)),
+                      child: Transform.translate(
+                        offset: const Offset(24, -27),
+                        child: Container(
+                          width: 20,
+                          height: 20,
+                          decoration: const BoxDecoration(
+                            color: Colors.amber,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              "M",
+                              style: TextStyle(
+                                  backgroundColor:
+                                      Colors.white.withOpacity(0.1)),
+                            ),
+                          ),
+                        ),
                       ),
                     )
                   : const Text(""),
@@ -322,10 +352,10 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                         )
                     ],
                   ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.favorite_border_rounded),
-                  )
+                  // IconButton(
+                  //   onPressed: () {},
+                  //   icon: const Icon(Icons.favorite_border_rounded),
+                  // )
                 ],
               ),
             ],
