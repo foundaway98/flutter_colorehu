@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:colornames/colornames.dart';
 import 'package:cyclop/cyclop.dart';
@@ -75,6 +76,8 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
 
   List<bool> buttonSelected = [true, false, false];
 
+  bool isSharing = false;
+
   @override
   void initState() {
     super.initState();
@@ -107,13 +110,167 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    int trueChecked = 0;
+                    for (int i = 0; i < colorFlag.length; i++) {
+                      if (colorFlag[i] == true) trueChecked++;
+                    }
+                    ;
+
+                    if (trueChecked >= 3) {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return StatefulBuilder(
+                            builder:
+                                (BuildContext context, StateSetter setState) {
+                              return Dialog(
+                                child: Container(
+                                  height: 300,
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Padding(
+                                            padding: EdgeInsets.only(left: 8.0),
+                                            child: Text(
+                                              "색 조합 저장",
+                                              style: TextStyle(
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(Icons.close),
+                                            onPressed: () {
+                                              Navigator.of(context,
+                                                      rootNavigator: true)
+                                                  .pop();
+                                            },
+                                          )
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 30,
+                                      ),
+                                      SizedBox(
+                                        height: 105,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            for (int i = 0;
+                                                i < colorPack.length;
+                                                i++)
+                                              colorFlag[i]
+                                                  ? Column(
+                                                      children: [
+                                                        Container(
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: colorPack[i],
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: Colors
+                                                                    .grey
+                                                                    .withOpacity(
+                                                                        0.5),
+                                                                spreadRadius: 0,
+                                                                blurRadius: 3.0,
+                                                                offset:
+                                                                    const Offset(
+                                                                  0,
+                                                                  3,
+                                                                ), // changes position of shadow
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          margin:
+                                                              const EdgeInsets
+                                                                      .symmetric(
+                                                                  horizontal:
+                                                                      5),
+                                                          width: 50,
+                                                          height: 50,
+                                                        ),
+                                                        SizedBox(
+                                                          width: 50,
+                                                          child: Text(
+                                                              colorPack[i]
+                                                                  .colorName),
+                                                        )
+                                                      ],
+                                                    )
+                                                  : Container(),
+                                          ],
+                                        ),
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Wrap(
+                                            direction: Axis.vertical,
+                                            crossAxisAlignment:
+                                                WrapCrossAlignment.center,
+                                            spacing: -15,
+                                            children: [
+                                              Checkbox(
+                                                value: isSharing,
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    isSharing = !isSharing;
+                                                    value = isSharing;
+                                                  });
+                                                },
+                                              ),
+                                              const Text('share')
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            width: 5,
+                                          )
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          OutlinedButton(
+                                            onPressed: () {},
+                                            child: const Text(
+                                              'save',
+                                              style: TextStyle(
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 5,
+                                          )
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      );
+                    }
+                  },
                   icon: const Icon(Icons.save_alt_outlined),
                 ),
               ],
             ),
             Flexible(
-              flex: 2,
+              flex: 1,
               fit: FlexFit.tight,
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -125,6 +282,38 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                         for (int i = 0; i < colorPack.length; i++)
                           makeColorPickerButton(context, i),
                       ],
+                    ),
+                    Container(
+                      width: 200,
+                      height: 30,
+                      child: OutlinedButton(
+                        onPressed: () {},
+                        style: OutlinedButton.styleFrom(
+                            side: const BorderSide(
+                              color: Colors.black,
+                              width: 1,
+                            ),
+                            shape: const RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(8)))),
+                        child: const Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Icon(
+                                Icons.search,
+                                color: Colors.black,
+                              ),
+                              Text(
+                                'Search with Main',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                     LayoutBuilder(
                       builder: (context, constraints) {
@@ -154,7 +343,7 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                   ]),
             ),
             Flexible(
-              flex: 3,
+              flex: 2,
               fit: FlexFit.tight,
               child: Container(child: makeList(colorSuggestionList)),
             )
@@ -246,7 +435,7 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
           ),
           SizedBox(
             width: 50,
-            height: 50,
+            height: 40,
             child: Text(
               colorFlag[i] ? colorPack[i].colorName : '',
               style: const TextStyle(
