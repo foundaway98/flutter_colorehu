@@ -1,24 +1,28 @@
 import 'dart:convert';
 
-import 'package:colornames/colornames.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorehu/providers/user_provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:provider/provider.dart';
 import '../models/api_adapter.dart';
 import '../models/model_colorset.dart';
 import '../models/model_signin.dart';
+import 'package:cyclop/cyclop.dart';
+import 'package:colornames/colornames.dart';
 
 class MyPageScreen extends StatefulWidget {
   final User user;
   const MyPageScreen({super.key, required this.user});
+  static String routeName = "screens/my_page_screen.dart";
 
   @override
   State<MyPageScreen> createState() => _MyPageScreenState();
 }
 
-
-
 class _MyPageScreenState extends State<MyPageScreen> {
+  late Future<List<ColorSet>> colorList;
+  late UserProvider _userProvider;
   bool isEdited = false;
   String nickname = "";
   late User nicknameChangeduser;
@@ -47,26 +51,41 @@ class _MyPageScreenState extends State<MyPageScreen> {
 
   final _textController = TextEditingController();
 
-  changeNicknameFromServer(int id,String nickname) async {
+  void showToast() {
+    print("toast 시작");
+    Fluttertoast.showToast(
+      msg: "중복된 닉네임입니다",
+      gravity: ToastGravity.CENTER,
+      backgroundColor: Colors.amber,
+      toastLength: Toast.LENGTH_LONG,
+    );
+  }
+
+  changeNicknameFromServer(int id, String nickname) async {
     final response = await http.get(
       Uri.http('54.252.58.5:8000', 'signin/update/$id/$nickname'),
     );
     print("change nickname user = ${response.statusCode}");
-    if (response.statusCode==400){
-      return false;
-    }else{
+    if (response.statusCode == 400) {
+      showToast();
+    } else {
       nicknameChangeduser = User.fromJson(jsonDecode(response.body));
-      return true;
+      setState(() {
+        nickname = _textController.text;
+        _userProvider.nickname = nickname;
+        isEdited = !isEdited;
+      });
     }
   }
 
-  loadMyColorSetListFromServer(int id) async {
+  Future<List<ColorSet>> loadMyColorSetListFromServer(int id) async {
     final response = await http.get(
       Uri.http('54.252.58.5:8000', 'colorset/loadset/$id'),
     );
     print("get colorset My color set lists = ${response.statusCode}");
     String responseBody = utf8.decode(response.bodyBytes);
     List<ColorSet> list = parseColorSet(responseBody);
+    return list;
   }
 
   void editNickname() {
@@ -78,22 +97,13 @@ class _MyPageScreenState extends State<MyPageScreen> {
   @override
   void initState() {
     super.initState();
-    loadMyColorSetListFromServer(widget.user.id);
-
-  }
-
-  void saveNickname() {
-    nickname = _textController.text;
-    changeNicknameFromServer(widget.user.id,nickname);
-    print(nicknameChangeduser.nickname);
-    setState(() {
-      nickname = _textController.text;
-      isEdited = !isEdited;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
+    _userProvider = Provider.of<UserProvider>(context);
+    colorList = loadMyColorSetListFromServer(_userProvider.id);
+    nickname = _userProvider.nickname;
     return Scaffold(
       appBar: AppBar(
         title: const Text("My Page"),
@@ -116,84 +126,105 @@ class _MyPageScreenState extends State<MyPageScreen> {
                         ),
                       )
                     : Text(
-                        widget.user.nickname,
+                        _userProvider.nickname,
                         style: const TextStyle(fontSize: 24),
                       ),
                 IconButton(
-                  onPressed: () => isEdited ? saveNickname() : editNickname(),
+                  onPressed: () {
+                    nickname = _textController.text;
+                    isEdited
+                        ? changeNicknameFromServer(widget.user.id, nickname)
+                        : editNickname();
+                  },
                   icon: isEdited
                       ? const Icon(Icons.save_alt_outlined)
                       : const Icon(Icons.edit_outlined),
                 )
               ],
             ),
-            Text(nickname),
             Flexible(
-                flex: 3,
-                fit: FlexFit.tight,
-                child: makeList(colorSuggestionList))
+              flex: 3,
+              fit: FlexFit.tight,
+              child: FutureBuilder(
+                future: colorList,
+                builder: (context, futureResult) {
+                  if (futureResult.hasData) {
+                    return makeList(futureResult);
+                  }
+                  return const Center(
+                    child: Text("색 조합을 만들어보세요"),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  ListView makeList(List<String> colorSuggestionList) {
+  ListView makeList(AsyncSnapshot<List<ColorSet>> futureResult) {
     return ListView.separated(
-        shrinkWrap: false,
-        itemBuilder: (context, index) {
-          return Column(
-            children: [
-              const Text("Color Name + Color Name"),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (var color in colorSet[index])
-                        Column(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: color,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 0,
-                                    blurRadius: 3.0,
-                                    offset: const Offset(
-                                      0,
-                                      3,
-                                    ), // changes position of shadow
+      shrinkWrap: false,
+      itemCount: futureResult.data!.length,
+      itemBuilder: (context, index) {
+        var colorPack = [];
+        var color = futureResult.data![index];
+        colorPack.add(color.color1);
+        colorPack.add(color.color2);
+        colorPack.add(color.color3);
+        colorPack.add(color.color4);
+        colorPack.add(color.color5);
+        return Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (var color in colorPack)
+                      color != ""
+                          ? Column(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: ("$color").toColor(),
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 0,
+                                        blurRadius: 3.0,
+                                        offset: const Offset(
+                                          0,
+                                          3,
+                                        ), // changes position of shadow
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                              margin: const EdgeInsets.symmetric(horizontal: 5),
-                              width: 50,
-                              height: 50,
-                            ),
-                            SizedBox(
-                              width: 50,
-                              child: Text(color.colorName),
+                                  margin:
+                                      const EdgeInsets.symmetric(horizontal: 5),
+                                  width: 50,
+                                  height: 50,
+                                ),
+                                SizedBox(
+                                  width: 50,
+                                  child: Text("$color".toColor().colorName),
+                                )
+                              ],
                             )
-                          ],
-                        )
-                    ],
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.favorite_border_rounded),
-                  )
-                ],
-              ),
-            ],
-          );
-        },
-        separatorBuilder: (context, index) {
-          return const SizedBox(height: 5);
-        },
-        itemCount: colorSuggestionList.length);
+                          : const SizedBox()
+                  ],
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+      separatorBuilder: (context, index) {
+        return const SizedBox(height: 5);
+      },
+    );
   }
 }

@@ -1,23 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorehu/models/model_signin.dart';
+import 'package:flutter_colorehu/providers/user_provider.dart';
 import 'package:flutter_colorehu/screens/camera_filter_screen.dart';
 import 'package:flutter_colorehu/screens/camera_screen.dart';
 import 'package:flutter_colorehu/screens/color_suggest_screen.dart';
 import 'package:flutter_colorehu/screens/my_page_screen.dart';
+import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
   final User user;
   const MainScreen({super.key, required this.user});
 
-  static String routeName = "/main_screen.dart";
+  static String routeName = "screens/main_screen.dart";
 
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
+  late UserProvider _userProvider;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    _userProvider = Provider.of<UserProvider>(context);
+    String nickname = _userProvider.nickname;
     return WillPopScope(
       onWillPop: () {
         return Future(() => false);
@@ -34,7 +45,7 @@ class _MainScreenState extends State<MainScreen> {
                 decoration: const BoxDecoration(
                   color: Colors.amber,
                 ),
-                child: Text('Welcome, ${widget.user.nickname}'),
+                child: Text('Welcome, $nickname'),
               ),
               ListTile(
                 tileColor: Colors.grey.shade300,
