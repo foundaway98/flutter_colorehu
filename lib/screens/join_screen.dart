@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_colorehu/models/model_signin.dart';
 import 'package:flutter_colorehu/platforms/login_platform.dart';
@@ -22,13 +24,16 @@ class _JoinScreenState extends State<JoinScreen> {
   late String email;
   late String displayName;
   late GoogleSignInAccount userInfo;
+  late User userIdNickEmail;
 
-  toServer(String nickname, String email) async {
+  void toServer(String nickname, String email) async {
     var user = User(id: 0, nickname: nickname, email: email);
     final response = await http.post(Uri.http('54.252.58.5:8000', 'signin/'),
         body: user.toJson());
-
-    return response.body;
+    print(response.body);
+    if(response.statusCode==200){
+      userIdNickEmail = User.fromJson(jsonDecode(response.body));
+    }
   }
 
   void signInWithGoogle() async {
@@ -47,7 +52,6 @@ class _JoinScreenState extends State<JoinScreen> {
       displayName = googleUser.displayName!;
 
       toServer(displayName, email);
-
       setState(() {
         _loginPlatform = LoginPlatform.google;
         userInfo = googleUser;
@@ -110,7 +114,7 @@ class _JoinScreenState extends State<JoinScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => MainScreen(
-                                  user: userInfo,
+                                  user: userIdNickEmail,
                                 ),
                               ),
                             );

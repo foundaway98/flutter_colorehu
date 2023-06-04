@@ -1,16 +1,27 @@
+import 'dart:convert';
+
 import 'package:colornames/colornames.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
-class MyPageScreeen extends StatefulWidget {
-  const MyPageScreeen({super.key});
+import '../models/api_adapter.dart';
+import '../models/model_colorset.dart';
+import '../models/model_signin.dart';
+
+class MyPageScreen extends StatefulWidget {
+  final User user;
+  const MyPageScreen({super.key, required this.user});
 
   @override
-  State<MyPageScreeen> createState() => _MyPageScreeenState();
+  State<MyPageScreen> createState() => _MyPageScreenState();
 }
 
-class _MyPageScreeenState extends State<MyPageScreeen> {
+
+
+class _MyPageScreenState extends State<MyPageScreen> {
   bool isEdited = false;
   String nickname = "";
+  late User nicknameChangeduser;
 
   List<String> colorSuggestionList = ["a", "b", "c"];
   List<List<Color>> colorSet = [
@@ -36,13 +47,45 @@ class _MyPageScreeenState extends State<MyPageScreeen> {
 
   final _textController = TextEditingController();
 
+  changeNicknameFromServer(int id,String nickname) async {
+    final response = await http.get(
+      Uri.http('54.252.58.5:8000', 'signin/update/$id/$nickname'),
+    );
+    print("change nickname user = ${response.statusCode}");
+    if (response.statusCode==400){
+      return false;
+    }else{
+      nicknameChangeduser = User.fromJson(jsonDecode(response.body));
+      return true;
+    }
+  }
+
+  loadMyColorSetListFromServer(int id) async {
+    final response = await http.get(
+      Uri.http('54.252.58.5:8000', 'colorset/loadset/$id'),
+    );
+    print("get colorset My color set lists = ${response.statusCode}");
+    String responseBody = utf8.decode(response.bodyBytes);
+    List<ColorSet> list = parseColorSet(responseBody);
+  }
+
   void editNickname() {
     setState(() {
       isEdited = !isEdited;
     });
   }
 
+  @override
+  void initState() {
+    super.initState();
+    loadMyColorSetListFromServer(widget.user.id);
+
+  }
+
   void saveNickname() {
+    nickname = _textController.text;
+    changeNicknameFromServer(widget.user.id,nickname);
+    print(nicknameChangeduser.nickname);
     setState(() {
       nickname = _textController.text;
       isEdited = !isEdited;
@@ -73,7 +116,7 @@ class _MyPageScreeenState extends State<MyPageScreeen> {
                         ),
                       )
                     : Text(
-                        nickname,
+                        widget.user.nickname,
                         style: const TextStyle(fontSize: 24),
                       ),
                 IconButton(
