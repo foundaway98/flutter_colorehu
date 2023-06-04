@@ -16,10 +16,10 @@ class ColorSuggestScreen extends StatefulWidget {
   State<ColorSuggestScreen> createState() => _ColorSuggestScreenState();
 }
 
-load_recommend_fromServer(String colorStr) async {
+loadRecommendFromServer(String colorStr) async {
   String colorstr = colorStr;
   final response = await http.get(
-    Uri.http('54.252.58.5:8000', 'colorset/loadSet/${colorstr}'),
+    Uri.http('54.252.58.5:8000', 'colorset/loadSet/$colorstr'),
   );
   print("get colorset recommend lists = ${response.statusCode}");
   String responseBody = utf8.decode(response.bodyBytes);
@@ -27,11 +27,9 @@ load_recommend_fromServer(String colorStr) async {
   return list;
 }
 
-save_colorSet_toServer(ColorSet colorset) async{
-  final response = await http.post(
-      Uri.http('54.252.58.5:8000', 'colorset/'),
-      body: colorset.toJson()
-  );
+saveColorSetToServer(ColorSet colorset) async {
+  final response = await http.post(Uri.http('54.252.58.5:8000', 'colorset/'),
+      body: colorset.toJson());
   return response.body;
 }
 
@@ -48,16 +46,34 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
 
   List<String> colorTester = ["test1", "test2", "test3", "test4", "test5"];
   List<String> colorSuggestionList = ["a", "b", "c"];
-  List<List<String>> colorSet = [
-    ["r", "g", "b"],
-    ["r", "y", "b", "a"],
-    ["r", "w", "g", "g", "t"],
+  List<List<Color>> colorSet = [
+    [
+      Colors.black,
+      Colors.white,
+      Colors.grey,
+    ],
+    [
+      Colors.red,
+      Colors.green,
+      Colors.blue,
+      Colors.orange,
+    ],
+    [
+      Colors.blueGrey,
+      Colors.grey,
+      Colors.amber,
+      Colors.yellowAccent,
+      Colors.deepPurple,
+    ],
   ];
 
-  List<Text> buttons = [Text('PPT'), Text('fashion'), Text('interior')];
+  List<Text> buttons = [
+    const Text('PPT'),
+    const Text('fashion'),
+    const Text('interior')
+  ];
 
-  List<bool> button_selected = [true, false, false];
-
+  List<bool> buttonSelected = [true, false, false];
 
   @override
   void initState() {
@@ -100,43 +116,42 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
               flex: 2,
               fit: FlexFit.tight,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    for (int i = 0; i < colorPack.length; i++)
-                      makeColorPickerButton(context, i),
-                  ],
-                ),
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      return ToggleButtons(
-                        constraints: BoxConstraints.expand(
-                            width: constraints.maxWidth / 3.3),
-                        fillColor: Colors.cyan,
-                        selectedColor: Colors.black,
-                        borderRadius:
-                        const BorderRadius.all(Radius.circular(8)),
-                        onPressed: (index) {
-                          setState(() {
-                            for (int i = 0; i < button_selected.length; i++) {
-                              if (i == index) {
-                                button_selected[i] = true;
-                              } else {
-                                button_selected[i] = false;
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        for (int i = 0; i < colorPack.length; i++)
+                          makeColorPickerButton(context, i),
+                      ],
+                    ),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        return ToggleButtons(
+                          constraints: BoxConstraints.expand(
+                              width: constraints.maxWidth / 3.3),
+                          fillColor: Colors.cyan,
+                          selectedColor: Colors.black,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(8)),
+                          onPressed: (index) {
+                            setState(() {
+                              for (int i = 0; i < buttonSelected.length; i++) {
+                                if (i == index) {
+                                  buttonSelected[i] = true;
+                                } else {
+                                  buttonSelected[i] = false;
+                                }
                               }
-                            }
-                          });
-                        },
-                        children: buttons,
-                        isSelected: button_selected,
-                      );
-                    },
-                  )
-
-                ]
-              ),
+                            });
+                          },
+                          isSelected: buttonSelected,
+                          children: buttons,
+                        );
+                      },
+                    )
+                  ]),
             ),
             Flexible(
               flex: 3,
@@ -201,35 +216,33 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
               decoration: BoxDecoration(
                   color: colorPack[i],
                   border: Border.all(),
-                  borderRadius: BorderRadius.circular(8)
-              ),
+                  borderRadius: BorderRadius.circular(8)),
               width: i == 0 ? 55 : 50,
               height: i == 0 ? 55 : 50,
               child: i == 0
                   ? Center(
-                child: Transform.translate(
-                  offset: const Offset(24, -27),
-                  child: Container(
-                    width: 20,
-                    height: 20,
-                    decoration: const BoxDecoration(
-                      color: Colors.amber,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        "M",
-                        style: TextStyle(
-                            backgroundColor:
-                            Colors.white.withOpacity(0.1)),
+                      child: Transform.translate(
+                        offset: const Offset(24, -27),
+                        child: Container(
+                          width: 20,
+                          height: 20,
+                          decoration: const BoxDecoration(
+                            color: Colors.amber,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              "M",
+                              style: TextStyle(
+                                  backgroundColor:
+                                      Colors.white.withOpacity(0.1)),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-              )
+                    )
                   : const Text(""),
             ),
-
           ),
           SizedBox(
             width: 50,
@@ -252,19 +265,56 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
         itemBuilder: (context, index) {
           return Column(
             children: [
-              Text(
-                colorSuggestionList[index],
-                style: const TextStyle(
-                  fontSize: 44,
-                ),
-              ),
+              const Text("Color Name + Color Name"),
               Row(
-                children: [for (var color in colorSet[index]) Text(color)],
-              )
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (var color in colorSet[index])
+                        Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: color,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 0,
+                                    blurRadius: 3.0,
+                                    offset: const Offset(
+                                      0,
+                                      3,
+                                    ), // changes position of shadow
+                                  ),
+                                ],
+                              ),
+                              margin: const EdgeInsets.symmetric(horizontal: 5),
+                              width: 50,
+                              height: 50,
+                            ),
+                            SizedBox(
+                              width: 50,
+                              child: Text(color.colorName),
+                            )
+                          ],
+                        )
+                    ],
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.favorite_border_rounded),
+                  )
+                ],
+              ),
             ],
           );
         },
-        separatorBuilder: (context, index) => const SizedBox(height: 5),
+        separatorBuilder: (context, index) {
+          return const SizedBox(height: 5);
+        },
         itemCount: colorSuggestionList.length);
   }
 }
