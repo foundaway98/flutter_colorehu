@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:colornames/colornames.dart';
 import 'package:cyclop/cyclop.dart';
@@ -74,7 +73,14 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
     const Text('interior')
   ];
 
+  List<Text> dialogButton = [
+    const Text('PPT'),
+    const Text('fashion'),
+    const Text('interior')
+  ];
+
   List<bool> buttonSelected = [true, false, false];
+  List<bool> sharedToggle = [true, false, false];
 
   bool isSharing = false;
 
@@ -85,6 +91,55 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
       colorPack[0] = widget.color.toColor();
       colorFlag[0] = true;
     }
+  }
+
+  String converter(String colorString) {
+    List<String> alphabet = [
+      'A',
+      'B',
+      'C',
+      'D',
+      'E',
+      'F',
+      'G',
+      'H',
+      'I',
+      'J',
+      'K',
+      'L',
+      'M',
+      'N',
+      'O',
+      'P',
+      'Q',
+      'R',
+      'S',
+      'T',
+      'U',
+      'V',
+      'W',
+      'X',
+      'Y',
+      'Z'
+    ];
+
+    List<String> convertedString = [];
+    String result = "";
+
+    for (var i = 0; i <= 4; i += 2) {
+      convertedString.add(colorString.substring(i, i + 2));
+    }
+
+    for (String rgbValue in convertedString) {
+      int rgb = int.parse(rgbValue, radix: 16);
+
+      for (var i = 0; i < 26; i++) {
+        if (rgb ~/ 10 == i) {
+          result += alphabet[i];
+        }
+      }
+    }
+    return result;
   }
 
   @override
@@ -115,7 +170,6 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                     for (int i = 0; i < colorFlag.length; i++) {
                       if (colorFlag[i] == true) trueChecked++;
                     }
-                    ;
 
                     if (trueChecked >= 3) {
                       showDialog(
@@ -125,8 +179,8 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                             builder:
                                 (BuildContext context, StateSetter setState) {
                               return Dialog(
-                                child: Container(
-                                  height: 300,
+                                child: SizedBox(
+                                  height: 350,
                                   child: Column(
                                     children: [
                                       Row(
@@ -211,6 +265,35 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                                           ],
                                         ),
                                       ),
+                                      LayoutBuilder(
+                                        builder: (context, constraints) {
+                                          return ToggleButtons(
+                                            constraints: BoxConstraints.expand(
+                                                width:
+                                                    constraints.maxWidth / 3.3),
+                                            fillColor: Colors.cyan,
+                                            selectedColor: Colors.black,
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                                    Radius.circular(8)),
+                                            onPressed: (index) {
+                                              setState(() {
+                                                for (int i = 0;
+                                                    i < sharedToggle.length;
+                                                    i++) {
+                                                  if (i == index) {
+                                                    sharedToggle[i] = true;
+                                                  } else {
+                                                    sharedToggle[i] = false;
+                                                  }
+                                                }
+                                              });
+                                            },
+                                            isSelected: sharedToggle,
+                                            children: dialogButton,
+                                          );
+                                        },
+                                      ),
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.end,
@@ -233,7 +316,7 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                                               const Text('share')
                                             ],
                                           ),
-                                          SizedBox(
+                                          const SizedBox(
                                             width: 5,
                                           )
                                         ],
@@ -250,7 +333,7 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                                                   color: Colors.black),
                                             ),
                                           ),
-                                          SizedBox(
+                                          const SizedBox(
                                             width: 5,
                                           )
                                         ],
@@ -283,7 +366,7 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                           makeColorPickerButton(context, i),
                       ],
                     ),
-                    Container(
+                    SizedBox(
                       width: 200,
                       height: 30,
                       child: OutlinedButton(
@@ -339,7 +422,7 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                           children: buttons,
                         );
                       },
-                    )
+                    ),
                   ]),
             ),
             Flexible(
