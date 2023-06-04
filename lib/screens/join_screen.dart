@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorehu/models/model_signin.dart';
 import 'package:flutter_colorehu/platforms/login_platform.dart';
+import 'package:flutter_colorehu/providers/user_provider.dart';
 import 'package:flutter_colorehu/screens/main_screen.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
 import 'package:sign_button/sign_button.dart';
 import 'package:http/http.dart' as http;
 
@@ -16,6 +18,7 @@ class JoinScreen extends StatefulWidget {
 }
 
 class _JoinScreenState extends State<JoinScreen> {
+  late UserProvider _userProvider;
   LoginPlatform _loginPlatform = LoginPlatform.none;
   late String pw;
   late String checkedPW;
@@ -31,8 +34,11 @@ class _JoinScreenState extends State<JoinScreen> {
     final response = await http.post(Uri.http('54.252.58.5:8000', 'signin/'),
         body: user.toJson());
     print(response.body);
-    if(response.statusCode==200){
+    if (response.statusCode == 200) {
       userIdNickEmail = User.fromJson(jsonDecode(response.body));
+      _userProvider.email = userIdNickEmail.email;
+      _userProvider.nickname = userIdNickEmail.nickname;
+      _userProvider.id = userIdNickEmail.id;
     }
   }
 
@@ -63,7 +69,13 @@ class _JoinScreenState extends State<JoinScreen> {
   final formKey = GlobalKey<FormState>();
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    _userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
       body: Center(
         child: LayoutBuilder(
