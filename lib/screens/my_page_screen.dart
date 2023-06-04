@@ -27,28 +27,6 @@ class _MyPageScreenState extends State<MyPageScreen> {
   String nickname = "";
   late User nicknameChangeduser;
 
-  List<String> colorSuggestionList = ["a", "b", "c"];
-  List<List<Color>> colorSet = [
-    [
-      Colors.black,
-      Colors.white,
-      Colors.grey,
-    ],
-    [
-      Colors.red,
-      Colors.green,
-      Colors.blue,
-      Colors.orange,
-    ],
-    [
-      Colors.blueGrey,
-      Colors.grey,
-      Colors.amber,
-      Colors.yellowAccent,
-      Colors.deepPurple,
-    ],
-  ];
-
   final _textController = TextEditingController();
 
   void showToast() {
@@ -148,7 +126,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
               child: FutureBuilder(
                 future: colorList,
                 builder: (context, futureResult) {
-                  if (futureResult.hasData) {
+                  if (futureResult.hasData && !futureResult.data!.isEmpty) {
                     return makeList(futureResult);
                   }
                   return const Center(
