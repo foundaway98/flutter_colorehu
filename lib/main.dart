@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_colorehu/screens/login_screen.dart';
+import 'package:flutter_colorehu/screens/join_screen.dart';
+// import 'package:flutter_colorehu/screens/login_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const LoginScreen(),
+      home: const JoinScreen(),
     );
   }
 }

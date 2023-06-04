@@ -3,9 +3,11 @@ import 'package:flutter_colorehu/screens/camera_filter_screen.dart';
 import 'package:flutter_colorehu/screens/camera_screen.dart';
 import 'package:flutter_colorehu/screens/color_suggest_screen.dart';
 import 'package:flutter_colorehu/screens/my_page_screen.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final GoogleSignInAccount user;
+  const MainScreen({super.key, required this.user});
 
   static String routeName = "/main_screen.dart";
 
@@ -28,15 +30,15 @@ class _MainScreenState extends State<MainScreen> {
           child: ListView(
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              const DrawerHeader(
-                decoration: BoxDecoration(
+              DrawerHeader(
+                decoration: const BoxDecoration(
                   color: Colors.amber,
                 ),
-                child: Text("User Nickname"),
+                child: Text('Welcome, ${widget.user.displayName}'),
               ),
               ListTile(
                 tileColor: Colors.grey.shade300,
-                title: const Text("My Page"),
+                title: const Text("MyPage"),
                 onTap: () {
                   Navigator.push(
                     context,
