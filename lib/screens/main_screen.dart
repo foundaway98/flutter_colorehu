@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_colorehu/models/model_signin.dart';
 import 'package:flutter_colorehu/screens/camera_filter_screen.dart';
 import 'package:flutter_colorehu/screens/camera_screen.dart';
 import 'package:flutter_colorehu/screens/color_suggest_screen.dart';
 import 'package:flutter_colorehu/screens/my_page_screen.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 class MainScreen extends StatefulWidget {
-  final GoogleSignInAccount user;
+  final User user;
   const MainScreen({super.key, required this.user});
 
   static String routeName = "/main_screen.dart";
@@ -34,7 +34,7 @@ class _MainScreenState extends State<MainScreen> {
                 decoration: const BoxDecoration(
                   color: Colors.amber,
                 ),
-                child: Text('Welcome, ${widget.user.displayName}'),
+                child: Text('Welcome, ${widget.user.nickname}'),
               ),
               ListTile(
                 tileColor: Colors.grey.shade300,
@@ -43,7 +43,9 @@ class _MainScreenState extends State<MainScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const MyPageScreeen(),
+                      builder: (context) => MyPageScreen(
+                        user: widget.user,
+                      ),
                     ),
                   );
                 },

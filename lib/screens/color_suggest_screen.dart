@@ -17,9 +17,8 @@ class ColorSuggestScreen extends StatefulWidget {
 }
 
 loadRecommendFromServer(String colorStr) async {
-  String colorstr = colorStr;
   final response = await http.get(
-    Uri.http('54.252.58.5:8000', 'colorset/loadSet/$colorstr'),
+    Uri.http('54.252.58.5:8000', 'colorset/loadrecommendset/$colorStr'),
   );
   print("get colorset recommend lists = ${response.statusCode}");
   String responseBody = utf8.decode(response.bodyBytes);
@@ -27,11 +26,15 @@ loadRecommendFromServer(String colorStr) async {
   return list;
 }
 
+
 saveColorSetToServer(ColorSet colorset) async {
   final response = await http.post(Uri.http('54.252.58.5:8000', 'colorset/'),
       body: colorset.toJson());
   return response.body;
 }
+
+
+
 
 class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
   List<Color> colorPack = [
