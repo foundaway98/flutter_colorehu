@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_colorehu/providers/user_provider.dart';
+import 'package:flutter_colorehu/widgets/color_box_widget.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -63,6 +64,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
     print("get colorset My color set lists = ${response.statusCode}");
     String responseBody = utf8.decode(response.bodyBytes);
     List<ColorSet> list = parseColorSet(responseBody);
+    print(list[0].colorsetstr);
     return list;
   }
 
@@ -126,7 +128,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
               child: FutureBuilder(
                 future: colorList,
                 builder: (context, futureResult) {
-                  if (futureResult.hasData && !futureResult.data!.isEmpty) {
+                  if (futureResult.hasData && futureResult.data!.isNotEmpty) {
                     return makeList(futureResult);
                   }
                   return const Center(
@@ -161,34 +163,14 @@ class _MyPageScreenState extends State<MyPageScreen> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    for (var color in colorPack)
+                    for (String color in colorPack)
                       color != ""
                           ? Column(
                               children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: ("$color").toColor(),
-                                    borderRadius: BorderRadius.circular(10),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 0,
-                                        blurRadius: 3.0,
-                                        offset: const Offset(
-                                          0,
-                                          3,
-                                        ), // changes position of shadow
-                                      ),
-                                    ],
-                                  ),
-                                  margin:
-                                      const EdgeInsets.symmetric(horizontal: 5),
-                                  width: 50,
-                                  height: 50,
-                                ),
+                                ColorBoxWidget(color: color.toColor()),
                                 SizedBox(
                                   width: 50,
-                                  child: Text("$color".toColor().colorName),
+                                  child: Text(color.toColor().colorName),
                                 )
                               ],
                             )
