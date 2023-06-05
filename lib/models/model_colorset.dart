@@ -1,5 +1,6 @@
 class ColorSet{
 
+  int id;
   String color1;
   String color2;
   String color3;
@@ -10,6 +11,7 @@ class ColorSet{
   String keyword;
 
   ColorSet({
+    required this.id,
     required this.color1,
     required this.color2,
     required this.color3,
@@ -22,6 +24,7 @@ class ColorSet{
 
 
    Map<String, dynamic> toJson() => {
+     'id' : id,
      'color1' :color1,
      'color2' :color2,
      'color3' :color3,
@@ -34,6 +37,7 @@ class ColorSet{
 
   factory ColorSet.fromJson(Map<String, dynamic> json) {
     return ColorSet(
+        id:json['id'],
         color1:json['color1'],
         color2:json['color2'],
         color3:json['color3'],
