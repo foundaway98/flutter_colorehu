@@ -18,6 +18,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  //provider
   late UserProvider _userProvider;
 
   @override
@@ -27,6 +28,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //provider 생성
     _userProvider = Provider.of<UserProvider>(context);
     String nickname = _userProvider.nickname;
     return WillPopScope(
@@ -96,9 +98,10 @@ class _MainScreenState extends State<MainScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const ColorSuggestScreen(
-                              color: '',
-                            )),
+                      builder: (context) => const ColorSuggestScreen(
+                        color: '',
+                      ),
+                    ),
                   );
                 },
                 child: MainScreenBtn(

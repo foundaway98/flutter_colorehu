@@ -3,7 +3,10 @@ import 'dart:convert';
 import 'package:colornames/colornames.dart';
 import 'package:cyclop/cyclop.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorehu/providers/user_provider.dart';
+import 'package:flutter_colorehu/widgets/color_box_widget.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import '../models/api_adapter.dart';
 import '../models/model_colorset.dart';
 
@@ -16,9 +19,11 @@ class ColorSuggestScreen extends StatefulWidget {
   State<ColorSuggestScreen> createState() => _ColorSuggestScreenState();
 }
 
-Future<List<ColorSet>> loadRecommendFromServer(String colorStr,String keyword) async {
+Future<List<ColorSet>> loadRecommendFromServer(
+    String colorStr, String keyword) async {
   final response = await http.get(
-    Uri.http('54.252.58.5:8000', 'colorset/loadrecommendset/$colorStr/$keyword'),
+    Uri.http(
+        '54.252.58.5:8000', 'colorset/loadrecommendset/$colorStr/$keyword'),
   );
   print("get colorset recommend lists = ${response.statusCode}");
   String responseBody = utf8.decode(response.bodyBytes);
@@ -26,18 +31,18 @@ Future<List<ColorSet>> loadRecommendFromServer(String colorStr,String keyword) a
   return list;
 }
 
-
 saveColorSetToServer(ColorSet colorset) async {
   final response = await http.post(Uri.http('54.252.58.5:8000', 'colorset/'),
-      body: colorset.toJson());
+      headers: {'Content-type': 'application/json'},
+      body: jsonEncode(colorset));
   return response.body;
 }
 
-
-
-
 class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
-  List<Color> colorPack = [
+  //provider
+  late UserProvider _userProvider;
+  late Future<List<ColorSet>> colorList;
+  List<Color> userSelectedColors = [
     Colors.white,
     Colors.white,
     Colors.white,
@@ -72,26 +77,31 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
 
   List<Text> buttons = [
     const Text('PPT'),
-    const Text('fashion'),
-    const Text('interior')
+    const Text('Fashion'),
+    const Text('Interior')
   ];
 
   List<Text> dialogButton = [
     const Text('PPT'),
-    const Text('fashion'),
-    const Text('interior')
+    const Text('Fashion'),
+    const Text('Interior')
   ];
 
-  List<bool> buttonSelected = [true, false, false];
+  List<bool> buttonSelected = [false, false, false];
   List<bool> sharedToggle = [true, false, false];
+  List<String> buttonString = ["PPT", "Fashion", "Interior"];
 
   bool isSharing = false;
+
+  List<bool> toggleButtonInIt() {
+    return [false, false, false];
+  }
 
   @override
   void initState() {
     super.initState();
     if (widget.color != "") {
-      colorPack[0] = widget.color.toColor();
+      userSelectedColors[0] = widget.color.toColor();
       colorFlag[0] = true;
     }
   }
@@ -134,7 +144,7 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
     }
 
     for (String rgbValue in convertedString) {
-      int rgb = int.parse(rgbValue, radix: 16);
+      var rgb = int.parse(rgbValue, radix: 16);
 
       for (var i = 0; i < 26; i++) {
         if (rgb ~/ 10 == i) {
@@ -147,294 +157,363 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //provider 생성
+    _userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
-        appBar: AppBar(
-          title: const Icon(Icons.color_lens_outlined),
-        ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                const SizedBox(
-                  width: 48,
+      appBar: AppBar(
+        title: const Icon(Icons.color_lens_outlined),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              IconButton(
+                onPressed: () {
+                  setState(
+                    () {
+                      userSelectedColors = [
+                        Colors.white,
+                        Colors.white,
+                        Colors.white,
+                        Colors.white,
+                        Colors.white,
+                      ];
+                      colorFlag = [false, false, false, false, false];
+                      buttonSelected = toggleButtonInIt();
+                    },
+                  );
+                },
+                icon: const Icon(
+                  Icons.refresh_rounded,
                 ),
-                const Text(
-                  "Color Set",
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w200,
-                  ),
+              ),
+              const Text(
+                "Color Set",
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w200,
                 ),
-                IconButton(
-                  onPressed: () {
-                    int trueChecked = 0;
-                    for (int i = 0; i < colorFlag.length; i++) {
-                      if (colorFlag[i] == true) trueChecked++;
-                    }
+              ),
+              IconButton(
+                onPressed: () {
+                  int trueChecked = 0;
+                  for (int i = 0; i < colorFlag.length; i++) {
+                    if (colorFlag[i] == true) trueChecked++;
+                  }
 
-                    if (trueChecked >= 3) {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return StatefulBuilder(
-                            builder:
-                                (BuildContext context, StateSetter setState) {
-                              return Dialog(
-                                child: SizedBox(
-                                  height: 350,
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          const Padding(
-                                            padding: EdgeInsets.only(left: 8.0),
-                                            child: Text(
-                                              "색 조합 저장",
-                                              style: TextStyle(
-                                                  color: Colors.black),
-                                            ),
+                  if (trueChecked >= 3) {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return StatefulBuilder(
+                          builder:
+                              (BuildContext context, StateSetter setState) {
+                            return Dialog(
+                              child: SizedBox(
+                                height: 350,
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Padding(
+                                          padding: EdgeInsets.only(left: 8.0),
+                                          child: Text(
+                                            "색 조합 저장",
+                                            style:
+                                                TextStyle(color: Colors.black),
                                           ),
-                                          IconButton(
-                                            icon: const Icon(Icons.close),
-                                            onPressed: () {
-                                              Navigator.of(context,
-                                                      rootNavigator: true)
-                                                  .pop();
-                                            },
-                                          )
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.close),
+                                          onPressed: () {
+                                            Navigator.of(context,
+                                                    rootNavigator: true)
+                                                .pop();
+                                          },
+                                        )
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                      height: 30,
+                                    ),
+                                    SizedBox(
+                                      height: 105,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          for (int i = 0;
+                                              i < userSelectedColors.length;
+                                              i++)
+                                            colorFlag[i]
+                                                ? Column(
+                                                    children: [
+                                                      Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color:
+                                                              userSelectedColors[
+                                                                  i],
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              color: Colors.grey
+                                                                  .withOpacity(
+                                                                      0.5),
+                                                              spreadRadius: 0,
+                                                              blurRadius: 3.0,
+                                                              offset:
+                                                                  const Offset(
+                                                                0,
+                                                                3,
+                                                              ), // changes position of shadow
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        margin: const EdgeInsets
+                                                                .symmetric(
+                                                            horizontal: 5),
+                                                        width: 50,
+                                                        height: 50,
+                                                      ),
+                                                      SizedBox(
+                                                        width: 50,
+                                                        child: Text(
+                                                            userSelectedColors[
+                                                                    i]
+                                                                .colorName),
+                                                      )
+                                                    ],
+                                                  )
+                                                : Container(),
                                         ],
                                       ),
-                                      const SizedBox(
-                                        height: 30,
-                                      ),
-                                      SizedBox(
-                                        height: 105,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                    ),
+                                    LayoutBuilder(
+                                      builder: (context, constraints) {
+                                        return ToggleButtons(
+                                          constraints: BoxConstraints.expand(
+                                              width:
+                                                  constraints.maxWidth / 3.3),
+                                          fillColor: Colors.cyan,
+                                          selectedColor: Colors.black,
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(8)),
+                                          onPressed: (index) {
+                                            setState(() {
+                                              for (int i = 0;
+                                                  i < sharedToggle.length;
+                                                  i++) {
+                                                if (i == index) {
+                                                  sharedToggle[i] = true;
+                                                } else {
+                                                  sharedToggle[i] = false;
+                                                }
+                                              }
+                                            });
+                                          },
+                                          isSelected: sharedToggle,
+                                          children: dialogButton,
+                                        );
+                                      },
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Wrap(
+                                          direction: Axis.vertical,
+                                          crossAxisAlignment:
+                                              WrapCrossAlignment.center,
+                                          spacing: -15,
                                           children: [
-                                            for (int i = 0;
-                                                i < colorPack.length;
-                                                i++)
-                                              colorFlag[i]
-                                                  ? Column(
-                                                      children: [
-                                                        Container(
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: colorPack[i],
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                            boxShadow: [
-                                                              BoxShadow(
-                                                                color: Colors
-                                                                    .grey
-                                                                    .withOpacity(
-                                                                        0.5),
-                                                                spreadRadius: 0,
-                                                                blurRadius: 3.0,
-                                                                offset:
-                                                                    const Offset(
-                                                                  0,
-                                                                  3,
-                                                                ), // changes position of shadow
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          margin:
-                                                              const EdgeInsets
-                                                                      .symmetric(
-                                                                  horizontal:
-                                                                      5),
-                                                          width: 50,
-                                                          height: 50,
-                                                        ),
-                                                        SizedBox(
-                                                          width: 50,
-                                                          child: Text(
-                                                              colorPack[i]
-                                                                  .colorName),
-                                                        )
-                                                      ],
-                                                    )
-                                                  : Container(),
+                                            Checkbox(
+                                              value: isSharing,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  isSharing = !isSharing;
+                                                  value = isSharing;
+                                                });
+                                              },
+                                            ),
+                                            const Text('share')
                                           ],
                                         ),
-                                      ),
-                                      LayoutBuilder(
-                                        builder: (context, constraints) {
-                                          return ToggleButtons(
-                                            constraints: BoxConstraints.expand(
-                                                width:
-                                                    constraints.maxWidth / 3.3),
-                                            fillColor: Colors.cyan,
-                                            selectedColor: Colors.black,
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                                    Radius.circular(8)),
-                                            onPressed: (index) {
-                                              setState(() {
-                                                for (int i = 0;
-                                                    i < sharedToggle.length;
-                                                    i++) {
-                                                  if (i == index) {
-                                                    sharedToggle[i] = true;
-                                                  } else {
-                                                    sharedToggle[i] = false;
-                                                  }
+                                        const SizedBox(
+                                          width: 5,
+                                        )
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        OutlinedButton(
+                                          onPressed: () {
+                                            List<String> colorString = [
+                                              "",
+                                              "",
+                                              "",
+                                              "",
+                                              ""
+                                            ];
+                                            String colorsetstr = "";
+                                            String keyword = "PPT";
+
+                                            //make colors to string
+                                            for (int i = 0; i < 5; i++) {
+                                              if (colorFlag[i] == true) {
+                                                colorString[i] =
+                                                    userSelectedColors[i]
+                                                        .toString()
+                                                        .substring(8, 16);
+                                              }
+                                            }
+
+                                            //make colorsetstr
+                                            for (String c in colorString) {
+                                              if (c != "") {
+                                                String css = converter(c);
+                                                colorsetstr += css;
+                                                colorsetstr += ',';
+                                              }
+                                            }
+
+                                            //set sharing
+
+                                            //set keyword
+                                            for (int i = 0; i < 3; i++) {
+                                              if (sharedToggle[i] == true) {
+                                                if (i == 0) {
+                                                  keyword = "PPT";
+                                                } else if (i == 1) {
+                                                  keyword = "Fashion";
+                                                } else if (i == 2) {
+                                                  keyword = "Interior";
                                                 }
-                                              });
-                                            },
-                                            isSelected: sharedToggle,
-                                            children: dialogButton,
-                                          );
-                                        },
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          Wrap(
-                                            direction: Axis.vertical,
-                                            crossAxisAlignment:
-                                                WrapCrossAlignment.center,
-                                            spacing: -15,
-                                            children: [
-                                              Checkbox(
-                                                value: isSharing,
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    isSharing = !isSharing;
-                                                    value = isSharing;
-                                                  });
-                                                },
-                                              ),
-                                              const Text('share')
-                                            ],
+                                              }
+                                            }
+
+                                            saveColorSetToServer(
+                                              ColorSet(
+                                                  id: 0,
+                                                  uid: _userProvider.id,
+                                                  color1: colorString[0],
+                                                  color2: colorString[1],
+                                                  color3: colorString[2],
+                                                  color4: colorString[3],
+                                                  color5: colorString[4],
+                                                  colorsetstr: colorsetstr,
+                                                  share: isSharing,
+                                                  keyword: keyword),
+                                            );
+
+                                            Navigator.of(context,
+                                                    rootNavigator: true)
+                                                .pop();
+                                          },
+                                          child: const Text(
+                                            'save',
+                                            style:
+                                                TextStyle(color: Colors.black),
                                           ),
-                                          const SizedBox(
-                                            width: 5,
-                                          )
-                                        ],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          OutlinedButton(
-                                            onPressed: () {},
-                                            child: const Text(
-                                              'save',
-                                              style: TextStyle(
-                                                  color: Colors.black),
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            width: 5,
-                                          )
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      );
-                    }
-                  },
-                  icon: const Icon(Icons.save_alt_outlined),
-                ),
-              ],
-            ),
-            Flexible(
-              flex: 1,
-              fit: FlexFit.tight,
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        for (int i = 0; i < colorPack.length; i++)
-                          makeColorPickerButton(context, i),
-                      ],
-                    ),
-                    SizedBox(
-                      width: 200,
-                      height: 30,
-                      child: OutlinedButton(
-                        onPressed: () {},
-                        style: OutlinedButton.styleFrom(
-                            side: const BorderSide(
-                              color: Colors.black,
-                              width: 1,
-                            ),
-                            shape: const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(8)))),
-                        child: const Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Icon(
-                                Icons.search,
-                                color: Colors.black,
-                              ),
-                              Text(
-                                'Search with Main',
-                                style: TextStyle(
-                                  color: Colors.black,
+                                        ),
+                                        const SizedBox(
+                                          width: 5,
+                                        )
+                                      ],
+                                    )
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        return ToggleButtons(
-                          constraints: BoxConstraints.expand(
-                              width: constraints.maxWidth / 3.3),
-                          fillColor: Colors.cyan,
-                          selectedColor: Colors.black,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(8)),
-                          onPressed: (index) {
-                            setState(() {
-                              for (int i = 0; i < buttonSelected.length; i++) {
-                                if (i == index) {
-                                  buttonSelected[i] = true;
-                                } else {
-                                  buttonSelected[i] = false;
-                                }
-                              }
-                            });
+                            );
                           },
-                          isSelected: buttonSelected,
-                          children: buttons,
                         );
                       },
-                    ),
-                  ]),
-            ),
-            Flexible(
-              flex: 2,
-              fit: FlexFit.tight,
-              child: Container(child: makeList(colorSuggestionList)),
-            )
-          ],
-        ));
+                    );
+                  }
+                },
+                icon: const Icon(Icons.save_alt_outlined),
+              ),
+            ],
+          ),
+          Flexible(
+            flex: 1,
+            fit: FlexFit.tight,
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      for (int i = 0; i < userSelectedColors.length; i++)
+                        makeColorPickerButton(context, i),
+                    ],
+                  ),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [],
+                  ),
+                  Flexible(
+                    child: colorFlag[0]
+                        ? ToggleButtons(
+                            constraints: const BoxConstraints.expand(
+                                height: 40, width: 100),
+                            fillColor: Colors.cyan,
+                            selectedColor: Colors.black,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                            onPressed: (index) {
+                              setState(() {
+                                colorList = loadRecommendFromServer(
+                                    converter(userSelectedColors
+                                        .toString()
+                                        .substring(10, 16)),
+                                    buttonString[index]);
+                                for (int i = 0;
+                                    i < buttonSelected.length;
+                                    i++) {
+                                  if (i == index) {
+                                    buttonSelected[i] = true;
+                                  } else {
+                                    buttonSelected[i] = false;
+                                  }
+                                }
+                              });
+                            },
+                            isSelected: buttonSelected,
+                            children: buttons,
+                          )
+                        : const SizedBox(),
+                  ),
+                ]),
+          ),
+          Flexible(
+            flex: 2,
+            fit: FlexFit.tight,
+            child: !buttonSelected.contains(true)
+                ? const Text("M 색을 선택 후 버튼을 눌러주세요")
+                : FutureBuilder(
+                    future: colorList,
+                    builder: (context, futureResult) {
+                      if (futureResult.hasData) {
+                        return makeList(futureResult);
+                      }
+                      return const Center(
+                        child: Text("..."),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
   }
 
   Padding makeColorPickerButton(BuildContext context, i) {
@@ -448,7 +527,8 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
             onTap: () {
               setState(() {
                 colorFlag[i] = false;
-                colorPack[i] = Colors.white;
+                userSelectedColors[i] = Colors.white;
+                buttonSelected = toggleButtonInIt();
               });
             },
             child: const SizedBox(
@@ -467,12 +547,12 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                 builder: (context) {
                   return Dialog(
                     child: ColorPicker(
-                      selectedColor: colorPack[i],
+                      selectedColor: userSelectedColors[i],
                       onColorSelected: (value) {
                         setState(() {
                           colorFlag[i] = true;
-                          colorPack[i] = value;
-                          print(colorFlag);
+                          userSelectedColors[i] = value;
+                          buttonSelected = toggleButtonInIt();
                         });
                       },
                       config: const ColorPickerConfig(
@@ -489,7 +569,7 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
             },
             child: Container(
               decoration: BoxDecoration(
-                  color: colorPack[i],
+                  color: userSelectedColors[i],
                   border: Border.all(),
                   borderRadius: BorderRadius.circular(8)),
               width: i == 0 ? 55 : 50,
@@ -523,7 +603,7 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
             width: 50,
             height: 40,
             child: Text(
-              colorFlag[i] ? colorPack[i].colorName : '',
+              colorFlag[i] ? userSelectedColors[i].colorName : '',
               style: const TextStyle(
                 fontSize: 12,
               ),
@@ -534,62 +614,83 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
     );
   }
 
-  ListView makeList(List<String> colorSuggestionList) {
+  ListView makeList(AsyncSnapshot<List<ColorSet>> futureResult) {
     return ListView.separated(
-        shrinkWrap: false,
-        itemBuilder: (context, index) {
-          return Column(
-            children: [
-              const Text("Color Name + Color Name"),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (var color in colorSet[index])
-                        Column(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: color,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 0,
-                                    blurRadius: 3.0,
-                                    offset: const Offset(
-                                      0,
-                                      3,
-                                    ), // changes position of shadow
-                                  ),
-                                ],
-                              ),
-                              margin: const EdgeInsets.symmetric(horizontal: 5),
-                              width: 50,
-                              height: 50,
-                            ),
-                            SizedBox(
-                              width: 50,
-                              child: Text(color.colorName),
+      shrinkWrap: false,
+      itemCount: futureResult.data!.length,
+      itemBuilder: (context, index) {
+        var colorPack = [];
+        var color = futureResult.data![index];
+        colorPack.add(color.color1);
+        colorPack.add(color.color2);
+        colorPack.add(color.color3);
+        colorPack.add(color.color4);
+        colorPack.add(color.color5);
+        return Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (String color in colorPack)
+                      color != ""
+                          ? Column(
+                              children: [
+                                ColorBoxWidget(color: color.toColor()),
+                                SizedBox(
+                                  width: 50,
+                                  child: Text(color.toColor().colorName),
+                                )
+                              ],
                             )
-                          ],
-                        )
-                    ],
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.favorite_border_rounded),
-                  )
-                ],
-              ),
-            ],
-          );
-        },
-        separatorBuilder: (context, index) {
-          return const SizedBox(height: 5);
-        },
-        itemCount: colorSuggestionList.length);
+                          : const SizedBox()
+                  ],
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+      separatorBuilder: (context, index) {
+        return const SizedBox(height: 5);
+      },
+    );
   }
+  // ListView makeList(List<String> colorSuggestionList) {
+  //   return ListView.separated(
+  //       shrinkWrap: false,
+  //       itemBuilder: (context, index) {
+  //         return Column(
+  //           children: [
+  //             const Text("Color Name + Color Name"),
+  //             Row(
+  //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //               children: [
+  //                 Row(
+  //                   crossAxisAlignment: CrossAxisAlignment.start,
+  //                   children: [
+  //                     for (var color in colorSet[index])
+  //                       Column(
+  //                         children: [
+  //                           ColorBoxWidget(color: color),
+  //                           SizedBox(
+  //                             width: 50,
+  //                             child: Text(color.colorName),
+  //                           )
+  //                         ],
+  //                       )
+  //                   ],
+  //                 ),
+  //               ],
+  //             ),
+  //           ],
+  //         );
+  //       },
+  //       separatorBuilder: (context, index) {
+  //         return const SizedBox(height: 5);
+  //       },
+  //       itemCount: colorSuggestionList.length);
+  // }
 }
