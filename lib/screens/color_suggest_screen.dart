@@ -52,29 +52,6 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
 
   List<bool> colorFlag = [false, false, false, false, false];
 
-  List<String> colorTester = ["test1", "test2", "test3", "test4", "test5"];
-  List<String> colorSuggestionList = ["a", "b", "c"];
-  List<List<Color>> colorSet = [
-    [
-      Colors.black,
-      Colors.white,
-      Colors.grey,
-    ],
-    [
-      Colors.red,
-      Colors.green,
-      Colors.blue,
-      Colors.orange,
-    ],
-    [
-      Colors.blueGrey,
-      Colors.grey,
-      Colors.amber,
-      Colors.yellowAccent,
-      Colors.deepPurple,
-    ],
-  ];
-
   List<Text> buttons = [
     const Text('PPT'),
     const Text('Fashion'),
