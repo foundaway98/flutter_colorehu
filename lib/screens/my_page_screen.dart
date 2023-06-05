@@ -40,6 +40,16 @@ class _MyPageScreenState extends State<MyPageScreen> {
     );
   }
 
+  deleteFromServer(int cid) async {
+    final response = await http.get(
+      Uri.http('54.252.58.5:8000', 'colorset/deleteset/$cid'),
+    );
+    print("delete colorset recommend lists = ${response.statusCode}");
+    // String responseBody = utf8.decode(response.bodyBytes);
+    // List<ColorSet> list = parseColorSet(responseBody);
+    // return list;
+  }
+
   changeNicknameFromServer(int id, String nickname) async {
     final response = await http.get(
       Uri.http('54.252.58.5:8000', 'signin/update/$id/$nickname'),
@@ -148,6 +158,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
       shrinkWrap: false,
       itemCount: futureResult.data!.length,
       itemBuilder: (context, index) {
+        bool isVisible = true;
         var colorPack = [];
         var color = futureResult.data![index];
         colorPack.add(color.color1);
@@ -155,31 +166,72 @@ class _MyPageScreenState extends State<MyPageScreen> {
         colorPack.add(color.color3);
         colorPack.add(color.color4);
         colorPack.add(color.color5);
-        return Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    for (String color in colorPack)
-                      color != ""
-                          ? Column(
-                              children: [
-                                ColorBoxWidget(color: color.toColor()),
-                                SizedBox(
-                                  width: 50,
-                                  child: Text(color.toColor().colorName),
-                                )
-                              ],
-                            )
-                          : const SizedBox()
-                  ],
-                ),
-              ],
-            ),
-          ],
+        return Visibility(
+          visible: isVisible,
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (String color in colorPack)
+                        color != ""
+                            ? Column(
+                                children: [
+                                  ColorBoxWidget(color: color.toColor()),
+                                  SizedBox(
+                                    width: 50,
+                                    child: Text(color.toColor().colorName),
+                                  )
+                                ],
+                              )
+                            : const SizedBox(),
+                      GestureDetector(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('삭제'),
+                                content: const Text("색 조합을 삭제하시겠습니까?"),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('취소'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      deleteFromServer(
+                                          futureResult.data![index].id);
+                                      setState(() {
+                                        isVisible = false;
+                                      });
+                                      Navigator.pop(
+                                        context,
+                                      );
+                                    },
+                                    child: const Text('삭제'),
+                                  )
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        child: const Text(
+                          "x",
+                          style: TextStyle(
+                            fontSize: 24,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         );
       },
       separatorBuilder: (context, index) {
