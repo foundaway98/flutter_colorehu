@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorehu/providers/user_provider.dart';
 import 'package:flutter_colorehu/widgets/color_box_widget.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_colorehu/widgets/toast_message.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '../models/api_adapter.dart';
@@ -30,15 +30,14 @@ class _MyPageScreenState extends State<MyPageScreen> {
 
   final _textController = TextEditingController();
 
-  void showToast() {
-    print("toast 시작");
-    Fluttertoast.showToast(
-      msg: "중복된 닉네임입니다",
-      gravity: ToastGravity.CENTER,
-      backgroundColor: Colors.amber,
-      toastLength: Toast.LENGTH_LONG,
-    );
-  }
+  // void showToast() {
+  //   Fluttertoast.showToast(
+  //     msg: "중복된 닉네임입니다",
+  //     gravity: ToastGravity.CENTER,
+  //     backgroundColor: Colors.amber,
+  //     toastLength: Toast.LENGTH_LONG,
+  //   );
+  // }
 
   deleteFromServer(int cid) async {
     final response = await http.get(
@@ -56,7 +55,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
     );
     print("change nickname user = ${response.statusCode}");
     if (response.statusCode == 400) {
-      showToast();
+      ToastMessage().showToast("중복된 닉네임");
     } else {
       nicknameChangeduser = User.fromJson(jsonDecode(response.body));
       setState(() {
