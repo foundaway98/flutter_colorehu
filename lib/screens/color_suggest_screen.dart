@@ -355,7 +355,7 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                                                 colorString[i] =
                                                     userSelectedColors[i]
                                                         .toString()
-                                                        .substring(8, 16);
+                                                        .substring(10, 16);
                                               }
                                             }
 
@@ -365,6 +365,8 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                                                 String css = converter(c);
                                                 colorsetstr += css;
                                                 colorsetstr += ',';
+                                                print(css);
+                                                print(colorsetstr);
                                               }
                                             }
 
@@ -456,7 +458,7 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                             onPressed: (index) {
                               setState(() {
                                 colorList = loadRecommendFromServer(
-                                    converter(userSelectedColors
+                                    converter(userSelectedColors[0]
                                         .toString()
                                         .substring(10, 16)),
                                     buttonString[index]);
