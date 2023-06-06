@@ -66,7 +66,11 @@ class _MainScreenState extends State<MainScreen> {
               ListTile(
                 tileColor: Colors.grey.shade300,
                 title: const Text("Log out"),
-                onTap: () {},
+                onTap: () {
+                  _userProvider.isLoggedIn = false;
+
+                  Navigator.pushReplacementNamed(context, '/');
+                },
               )
             ],
           ),

@@ -39,6 +39,7 @@ class _JoinScreenState extends State<JoinScreen> {
       _userProvider.email = userIdNickEmail.email;
       _userProvider.nickname = userIdNickEmail.nickname;
       _userProvider.id = userIdNickEmail.id;
+      _userProvider.isLoggedIn = true;
     }
   }
 
@@ -76,95 +77,100 @@ class _JoinScreenState extends State<JoinScreen> {
   @override
   Widget build(BuildContext context) {
     _userProvider = Provider.of<UserProvider>(context);
-    return Scaffold(
-      body: Center(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return Container(
-              width: constraints.maxWidth / 1.2,
-              height: constraints.maxHeight / 2,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: Colors.amber,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Welcome!",
-                    style: TextStyle(
-                      fontSize: 52,
-                      fontWeight: FontWeight.w300,
+    return WillPopScope(
+      onWillPop: () {
+        return Future(() => false);
+      },
+      child: Scaffold(
+        body: Center(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return Container(
+                width: constraints.maxWidth / 1.2,
+                height: constraints.maxHeight / 2,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Colors.amber,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Welcome!",
+                      style: TextStyle(
+                        fontSize: 52,
+                        fontWeight: FontWeight.w300,
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    height: constraints.maxHeight / 2 / 4,
-                  ),
-                  SignInButton(
-                    buttonType: ButtonType.google,
-                    imagePosition: ImagePosition.right,
-                    //[buttonSize] You can also use this in combination with [width]. Increases the font and icon size of the button.
-                    buttonSize: ButtonSize.large,
-                    btnTextColor: Colors.grey,
-                    btnColor: Colors.white,
-                    width: 140,
-                    //[width] Use if you change the text value.
-                    btnText: 'Google',
-                    onPressed: googleLogedIn
-                        ? null
-                        : () {
-                            signInWithGoogle();
-                          },
-                  ),
-                  SizedBox(
-                    height: constraints.maxHeight / 2 / 4 / 2,
-                  ),
-                  googleLogedIn
-                      ? GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => MainScreen(
-                                  user: userIdNickEmail,
+                    SizedBox(
+                      height: constraints.maxHeight / 2 / 4,
+                    ),
+                    SignInButton(
+                      buttonType: ButtonType.google,
+                      imagePosition: ImagePosition.right,
+                      //[buttonSize] You can also use this in combination with [width]. Increases the font and icon size of the button.
+                      buttonSize: ButtonSize.large,
+                      btnTextColor: Colors.grey,
+                      btnColor: Colors.white,
+                      width: 140,
+                      //[width] Use if you change the text value.
+                      btnText: 'Google',
+                      onPressed: _userProvider.isLoggedIn
+                          ? null
+                          : () {
+                              signInWithGoogle();
+                            },
+                    ),
+                    SizedBox(
+                      height: constraints.maxHeight / 2 / 4 / 2,
+                    ),
+                    _userProvider.isLoggedIn
+                        ? GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MainScreen(
+                                    user: userIdNickEmail,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: 100,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(25),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.4),
+                                    spreadRadius: 0,
+                                    blurRadius: 5.0,
+                                    offset: const Offset(
+                                      0,
+                                      3,
+                                    ), // changes position of shadow
+                                  ),
+                                ],
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  "Log In",
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
-                            );
-                          },
-                          child: Container(
-                            width: 100,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(25),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.4),
-                                  spreadRadius: 0,
-                                  blurRadius: 5.0,
-                                  offset: const Offset(
-                                    0,
-                                    3,
-                                  ), // changes position of shadow
-                                ),
-                              ],
                             ),
-                            child: const Center(
-                              child: Text(
-                                "Log In",
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                        )
-                      : const SizedBox()
-                ],
-              ),
-            );
-          },
+                          )
+                        : const SizedBox()
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
