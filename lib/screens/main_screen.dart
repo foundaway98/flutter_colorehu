@@ -5,6 +5,7 @@ import 'package:flutter_colorehu/screens/camera_filter_screen.dart';
 import 'package:flutter_colorehu/screens/camera_screen.dart';
 import 'package:flutter_colorehu/screens/color_suggest_screen.dart';
 import 'package:flutter_colorehu/screens/my_page_screen.dart';
+import 'package:flutter_colorehu/widgets/toast_message.dart';
 import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
@@ -24,6 +25,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
+    ToastMessage().showToast("로그인 성공");
   }
 
   @override

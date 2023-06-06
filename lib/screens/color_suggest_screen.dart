@@ -189,7 +189,7 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                               (BuildContext context, StateSetter setState) {
                             return Dialog(
                               child: SizedBox(
-                                height: 350,
+                                height: 400,
                                 child: Column(
                                   children: [
                                     Row(
@@ -219,58 +219,65 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                                       height: 30,
                                     ),
                                     SizedBox(
-                                      height: 105,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          for (int i = 0;
-                                              i < userSelectedColors.length;
-                                              i++)
-                                            colorFlag[i]
-                                                ? Column(
-                                                    children: [
-                                                      Container(
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color:
-                                                              userSelectedColors[
-                                                                  i],
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
-                                                          boxShadow: [
-                                                            BoxShadow(
-                                                              color: Colors.grey
-                                                                  .withOpacity(
-                                                                      0.5),
-                                                              spreadRadius: 0,
-                                                              blurRadius: 3.0,
-                                                              offset:
-                                                                  const Offset(
-                                                                0,
-                                                                3,
-                                                              ), // changes position of shadow
-                                                            ),
-                                                          ],
+                                      height: 125,
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            for (int i = 0;
+                                                i < userSelectedColors.length;
+                                                i++)
+                                              colorFlag[i]
+                                                  ? Column(
+                                                      children: [
+                                                        Container(
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color:
+                                                                userSelectedColors[
+                                                                    i],
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: Colors
+                                                                    .grey
+                                                                    .withOpacity(
+                                                                        0.5),
+                                                                spreadRadius: 0,
+                                                                blurRadius: 3.0,
+                                                                offset:
+                                                                    const Offset(
+                                                                  0,
+                                                                  3,
+                                                                ), // changes position of shadow
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          margin:
+                                                              const EdgeInsets
+                                                                      .symmetric(
+                                                                  horizontal:
+                                                                      5),
+                                                          width: 50,
+                                                          height: 50,
                                                         ),
-                                                        margin: const EdgeInsets
-                                                                .symmetric(
-                                                            horizontal: 5),
-                                                        width: 50,
-                                                        height: 50,
-                                                      ),
-                                                      SizedBox(
-                                                        width: 50,
-                                                        child: Text(
-                                                            userSelectedColors[
-                                                                    i]
-                                                                .colorName),
-                                                      )
-                                                    ],
-                                                  )
-                                                : Container(),
-                                        ],
+                                                        SizedBox(
+                                                          width: 50,
+                                                          child: Text(
+                                                              userSelectedColors[
+                                                                      i]
+                                                                  .colorName),
+                                                        )
+                                                      ],
+                                                    )
+                                                  : Container(),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                     LayoutBuilder(
@@ -635,39 +642,4 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
       },
     );
   }
-  // ListView makeList(List<String> colorSuggestionList) {
-  //   return ListView.separated(
-  //       shrinkWrap: false,
-  //       itemBuilder: (context, index) {
-  //         return Column(
-  //           children: [
-  //             const Text("Color Name + Color Name"),
-  //             Row(
-  //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //               children: [
-  //                 Row(
-  //                   crossAxisAlignment: CrossAxisAlignment.start,
-  //                   children: [
-  //                     for (var color in colorSet[index])
-  //                       Column(
-  //                         children: [
-  //                           ColorBoxWidget(color: color),
-  //                           SizedBox(
-  //                             width: 50,
-  //                             child: Text(color.colorName),
-  //                           )
-  //                         ],
-  //                       )
-  //                   ],
-  //                 ),
-  //               ],
-  //             ),
-  //           ],
-  //         );
-  //       },
-  //       separatorBuilder: (context, index) {
-  //         return const SizedBox(height: 5);
-  //       },
-  //       itemCount: colorSuggestionList.length);
-  // }
 }

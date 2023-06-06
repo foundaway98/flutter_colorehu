@@ -1,6 +1,8 @@
 import 'package:cyclop/cyclop.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_colorehu/widgets/toast_message.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:colornames/colornames.dart';
@@ -78,35 +80,41 @@ class _CameraScreenState extends State<CameraScreen> {
           body: Column(
             children: [
               Flexible(
-                  flex: 1,
-                  fit: FlexFit.tight,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          const SizedBox(
-                            width: 10,
+                flex: 1,
+                fit: FlexFit.tight,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: colorHex));
+                        ToastMessage().showToast("Hex값 복사 완료");
+                      },
+                      icon: const Icon(Icons.copy),
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        ValueListenableBuilder<Color?>(
+                          valueListenable: hoveredColor,
+                          builder: (context, value, _) => Container(
+                            color: value ?? Colors.transparent,
+                            width: 24,
+                            height: 24,
+                            margin: const EdgeInsets.all(8.0),
                           ),
-                          ValueListenableBuilder<Color?>(
-                            valueListenable: hoveredColor,
-                            builder: (context, value, _) => Container(
-                              color: value ?? Colors.transparent,
-                              width: 24,
-                              height: 24,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Text(colorHex),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Text(colorName)
-                        ],
-                      ),
-                      Row(children: [
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(colorHex),
+                            Text(colorName),
+                          ],
+                        )
+                      ],
+                    ),
+                    Row(
+                      children: [
                         GestureDetector(
                           onTap: () {
                             if (colorHex == '') {
@@ -114,9 +122,10 @@ class _CameraScreenState extends State<CameraScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ColorSuggestScreen(
-                                          color: colorHex,
-                                        )),
+                                  builder: (context) => ColorSuggestScreen(
+                                    color: colorHex,
+                                  ),
+                                ),
                               );
                             }
                           },
@@ -126,9 +135,11 @@ class _CameraScreenState extends State<CameraScreen> {
                         const SizedBox(
                           width: 10,
                         ),
-                      ])
-                    ],
-                  )),
+                      ],
+                    )
+                  ],
+                ),
+              ),
               Flexible(
                 flex: 5,
                 fit: FlexFit.tight,
