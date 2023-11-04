@@ -41,9 +41,8 @@ class _MyPageScreenState extends State<MyPageScreen> {
 
   deleteFromServer(int cid) async {
     final response = await http.get(
-      Uri.http('54.252.58.5:8000', 'colorset/deleteset/$cid'),
+      Uri.http('13.239.11.253:8000', 'colorset/deleteset/$cid'),
     );
-    print("delete colorset recommend lists = ${response.statusCode}");
     // String responseBody = utf8.decode(response.bodyBytes);
     // List<ColorSet> list = parseColorSet(responseBody);
     // return list;
@@ -51,9 +50,8 @@ class _MyPageScreenState extends State<MyPageScreen> {
 
   changeNicknameFromServer(int id, String nickname) async {
     final response = await http.get(
-      Uri.http('54.252.58.5:8000', 'signin/update/$id/$nickname'),
+      Uri.http('13.239.11.253:8000', 'signin/update/$id/$nickname'),
     );
-    print("change nickname user = ${response.statusCode}");
     if (response.statusCode == 400) {
       ToastMessage().showToast("중복된 닉네임");
     } else {
@@ -68,12 +66,10 @@ class _MyPageScreenState extends State<MyPageScreen> {
 
   Future<List<ColorSet>> loadMyColorSetListFromServer(int id) async {
     final response = await http.get(
-      Uri.http('54.252.58.5:8000', 'colorset/loadset/$id'),
+      Uri.http('13.239.11.253:8000', 'colorset/loadset/$id'),
     );
-    print("get colorset My color set lists = ${response.statusCode}");
     String responseBody = utf8.decode(response.bodyBytes);
     List<ColorSet> list = parseColorSet(responseBody);
-    print(list[0].colorsetstr);
     return list;
   }
 
@@ -130,6 +126,9 @@ class _MyPageScreenState extends State<MyPageScreen> {
                       : const Icon(Icons.edit_outlined),
                 )
               ],
+            ),
+            const SizedBox(
+              height: 10,
             ),
             Flexible(
               flex: 3,

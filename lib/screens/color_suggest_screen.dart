@@ -23,16 +23,15 @@ Future<List<ColorSet>> loadRecommendFromServer(
     String colorStr, String keyword) async {
   final response = await http.get(
     Uri.http(
-        '54.252.58.5:8000', 'colorset/loadrecommendset/$colorStr/$keyword'),
+        '13.239.11.253:8000', 'colorset/loadrecommendset/$colorStr/$keyword'),
   );
-  print("get colorset recommend lists = ${response.statusCode}");
   String responseBody = utf8.decode(response.bodyBytes);
   List<ColorSet> list = parseColorSet(responseBody);
   return list;
 }
 
 saveColorSetToServer(ColorSet colorset) async {
-  final response = await http.post(Uri.http('54.252.58.5:8000', 'colorset/'),
+  final response = await http.post(Uri.http('13.239.11.253:8000', 'colorset/'),
       headers: {'Content-type': 'application/json'},
       body: jsonEncode(colorset));
   return response.body;
@@ -365,8 +364,6 @@ class _ColorSuggestScreenState extends State<ColorSuggestScreen> {
                                                 String css = converter(c);
                                                 colorsetstr += css;
                                                 colorsetstr += ',';
-                                                print(css);
-                                                print(colorsetstr);
                                               }
                                             }
 

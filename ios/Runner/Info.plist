@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSMicrophoneUsageDescription</key>
+	<string></string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string></string>
+	<key>NSCameraUsageDescription</key>
+	<string></string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -22,6 +28,17 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.631313046530-of7i2ac2vj6811l9l80atbi1nn0ta0bc</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
@@ -47,26 +64,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>NSCameraUsageDescription</key>
-	<string>your usage description here</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>your usage description here</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>your usage description here</string>
-
-	<key>CFBundleURLTypes</key>
-    <array>
-      <dict>
-	  <key>CFBundleTypeRole</key>
-		<string>Editor</string>
-	  <key>CFBundleURLName</key>
-		<string>google</string>
-      <key>CFBundleURLSchemes</key>
-      <array>
-        <!-- google login -->
-        <string>com.googleusercontent.apps.631313046530-of7i2ac2vj6811l9l80atbi1nn0ta0bc</string>
-      </array>
-      </dict>
-    </array>
 </dict>
 </plist>
