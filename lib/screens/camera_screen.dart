@@ -47,7 +47,6 @@ class _CameraScreenState extends State<CameraScreen> {
         _cameraInitialized = true;
       });
     }).catchError((e) {
-      print(e);
     });
   }
 

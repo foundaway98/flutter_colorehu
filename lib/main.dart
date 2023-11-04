@@ -20,14 +20,14 @@ class MyApp extends StatelessWidget {
       create: (_) => UserProvider(),
       child: MaterialApp(
         theme: ThemeData(
-          colorScheme: const ColorScheme.light(
-            background: Colors.blue,
-          ),
+          fontFamily: 'Poppins',
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           textTheme: const TextTheme(
             displayLarge: TextStyle(
               color: Colors.black,
             ),
           ),
+          useMaterial3: true,
         ),
         home: const JoinScreen(),
       ),

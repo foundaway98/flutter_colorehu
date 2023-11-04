@@ -15,10 +15,8 @@ class _CameraFilterScreenState extends State<CameraFilterScreen> {
       appBar: AppBar(),
       body: CameraScreenPlugin(
         onDone: (value) {
-          print(value);
         },
         onVideoDone: (value) {
-          print(value);
         },
       ),
     );

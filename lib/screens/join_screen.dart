@@ -31,11 +31,10 @@ class _JoinScreenState extends State<JoinScreen> {
 
   void toServer(String nickname, String email) async {
     var user = User(id: 0, nickname: nickname, email: email);
-    final response = await http.post(Uri.http('54.252.58.5:8000', 'signin/'),
+    final response = await http.post(Uri.http('13.239.11.253:8000', 'signin/'),
         body: user.toJson());
-    print(response.body);
     if (response.statusCode == 200) {
-      userIdNickEmail = User.fromJson(jsonDecode(response.body));
+      userIdNickEmail = User.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
       _userProvider.email = userIdNickEmail.email;
       _userProvider.nickname = userIdNickEmail.nickname;
       _userProvider.id = userIdNickEmail.id;
@@ -49,11 +48,6 @@ class _JoinScreenState extends State<JoinScreen> {
     final googleUser = await googleSignIn.signIn();
 
     if (googleUser != null) {
-      print('name = ${googleUser.displayName}');
-      print('email = ${googleUser.email}');
-      print('id = ${googleUser.id}');
-      print('serverAuthCode = ${googleUser.serverAuthCode}');
-      print('${googleUser.hashCode}');
 
       email = googleUser.email;
       displayName = googleUser.displayName!;
@@ -85,45 +79,52 @@ class _JoinScreenState extends State<JoinScreen> {
         body: Center(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              return Container(
+              return SizedBox(
                 width: constraints.maxWidth / 1.2,
-                height: constraints.maxHeight / 2,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  color: Colors.amber,
-                ),
+                height: constraints.maxHeight / 1.4,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Welcome!",
-                      style: TextStyle(
-                        fontSize: 52,
-                        fontWeight: FontWeight.w300,
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: constraints.maxHeight / 20),
+                      child: const Text(
+                        "Welcome!",
+                        style: TextStyle(
+                          fontSize: 48,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
-                    SizedBox(
-                      height: constraints.maxHeight / 2 / 4,
+                    Padding(padding: EdgeInsets.symmetric(
+                      vertical: constraints.maxHeight / 30
+                      ),
+                      child: SizedBox(
+                        width: constraints.maxWidth / 3.5,
+                        height: constraints.maxHeight / 3.5,
+                        child: Image.asset(
+                          'assets/images/colorehu_icon_no_background.png'
+                        ),
+                      ),
                     ),
-                    SignInButton(
-                      buttonType: ButtonType.google,
-                      imagePosition: ImagePosition.right,
-                      //[buttonSize] You can also use this in combination with [width]. Increases the font and icon size of the button.
-                      buttonSize: ButtonSize.large,
-                      btnTextColor: Colors.grey,
-                      btnColor: Colors.white,
-                      width: 140,
-                      //[width] Use if you change the text value.
-                      btnText: 'Google',
-                      onPressed: _userProvider.isLoggedIn
-                          ? null
-                          : () {
-                              signInWithGoogle();
-                            },
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: constraints.maxHeight / 26),
+                      child: SignInButton(
+                        buttonType: ButtonType.google,
+                        imagePosition: ImagePosition.right,
+                        //[buttonSize] You can also use this in combination with [width]. Increases the font and icon size of the button.
+                        buttonSize: ButtonSize.large,
+                        btnTextColor: Colors.grey,
+                        btnColor: Colors.white,
+                        width: 140,
+                        //[width] Use if you change the text value.
+                        btnText: 'Google',
+                        onPressed: _userProvider.isLoggedIn
+                            ? null
+                            : () {
+                                signInWithGoogle();
+                              },
+                      ),
                     ),
-                    SizedBox(
-                      height: constraints.maxHeight / 2 / 4 / 2,
-                    ),
+                    
                     _userProvider.isLoggedIn
                         ? GestureDetector(
                             onTap: () {
